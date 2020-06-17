@@ -18,7 +18,7 @@ workshop_admin:
   admin: yes
 
 # The number of users created, as a string
-number_of_users: "30"
+number_of_users: "5"
 
 # Generate a sequence of users
 sequence_users: |
@@ -30,8 +30,9 @@ sequence_users: |
 # The users to create in OpenShift
 openshift_users: '{{ manual_users + [workshop_admin] + sequence_users|from_yaml }}'
 
-# The type of worker to provision (including MachineSet adjustments)
-cluster_worker_machine_type: m4.2xlarge
+# The type of machines to provision (including MachineSet adjustments)
+cluster_master_machine_type: m5a.xlarge
+cluster_worker_machine_type: m5a.2xlarge
 # The MachineSet replicas to enable on the MachineAutoscaler
 machineset_min_replicas: 0
 machineset_max_replicas: 5

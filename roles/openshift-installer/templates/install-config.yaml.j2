@@ -10,7 +10,9 @@ compute:
 controlPlane:
   hyperthreading: Enabled
   name: master
-  platform: {}
+  platform:
+    aws:
+      type: '{{ cluster_worker_machine_type }}'
   replicas: 3
 metadata:
   creationTimestamp: null
