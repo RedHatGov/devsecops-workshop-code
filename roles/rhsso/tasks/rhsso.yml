@@ -1,0 +1,6 @@
+---
+- name: Create RH-SSO Deployment
+  k8s:
+    kubeconfig: '{{ kubeconfig }}'
+    definition: '{{ lookup("template", "rhsso-deployment.yml.j2")|from_yaml }}'
+

@@ -1,0 +1,17 @@
+---
+## Create Realm and Configure Openshift IDP
+
+- name: Create Realm
+  k8s:
+    kubeconfig: '{{ kubeconfig }}'
+    definition: '{{ lookup("template", "rhsso-ocp-realm.yml.j2")|from_yaml }}'
+
+- name: Create OCP SSO Client
+  k8s:
+    kubeconfig: '{{ kubeconfig }}'
+    definition: '{{ lookup("template", "rhsso-ocp-client.yml.j2")|from_yaml }}'
+
+- name: Create RH-SSO IdP in OpenShift
+  k8s:
+    kubeconfig: '{{ kubeconfig }}'
+    definition: '{{ lookup("template", "rhsso-ocp-idp.yml.j2")|from_yaml }}'
