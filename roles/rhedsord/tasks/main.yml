@@ -2,3 +2,6 @@
 - include_role:
     name: gitea
   when: deploy_gitea
+- include_role:
+    name: nexus
+  when: deploy_nexus
