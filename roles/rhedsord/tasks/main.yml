@@ -3,5 +3,11 @@
     name: gitea
   when: deploy_gitea
 - include_role:
+    name: sonarqube
+  when: deploy_sonarqube
+- include_role:
     name: nexus
   when: deploy_nexus
+- include_role:
+    name: legacy-jenkins
+  when: deploy_legacy_jenkins

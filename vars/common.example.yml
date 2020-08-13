@@ -2,6 +2,7 @@
 # This tells the playbooks to not try to include default-named vars files
 common_included: yes
 
+connected_cluster: true
 
 ################################################################################
 # The following variables are especially important to pay attention to if you're
