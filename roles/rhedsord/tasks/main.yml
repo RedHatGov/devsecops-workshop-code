@@ -8,3 +8,6 @@
 - include_role:
     name: nexus
   when: deploy_nexus
+- include_role:
+    name: legacy-jenkins
+  when: deploy_legacy_jenkins
