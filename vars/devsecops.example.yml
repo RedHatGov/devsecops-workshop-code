@@ -49,6 +49,7 @@ pipeline_style: tekton
 # deploy_quay: no
 # deploy_service_mesh: no
 # deploy_gitea: no
+# deploy_argocd: no
 # deploy_sonarqube: no
 # deploy_nexus: no
 # deploy_3scale: no
