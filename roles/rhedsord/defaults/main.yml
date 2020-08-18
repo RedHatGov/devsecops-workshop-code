@@ -1,4 +1,5 @@
 ---
+deploy_rhsso: true
 deploy_quay: true
 deploy_gitea: true
 deploy_sonarqube: true

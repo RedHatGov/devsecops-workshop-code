@@ -2,7 +2,8 @@
 - apiVersion: keycloak.org/v1alpha1
   kind: KeycloakRealm
   metadata:
-    name: workshop-realm
+    name: {{ rhsso_realm_name }}
+    namespace: {{ rhsso_project_name }}
     labels:
       app: {{ rhsso_app_label }}
   spec:
