@@ -167,6 +167,27 @@ items:
         kind: DockerImage
         name: {{ workshop_spawner_image }}
       name: latest
+- kind: ImageStream
+  apiVersion: image.openshift.io/v1
+  metadata:
+    name: openshift-devsecops-labguides
+    namespace: {{ workshop_spawner_project_name }}
+  spec:
+    lookupPolicy:
+      local: true
+    tags:
+      - name: jenkins
+        from:
+          kind: DockerImage
+          name: {{ workshop_dashboard_image }}:jenkins
+        importPolicy:
+          scheduled: true
+      - name: tekton
+        from:
+          kind: DockerImage
+          name: {{ workshop_dashboard_image }}:tekton
+        importPolicy:
+          scheduled: true
 - apiVersion: v1
   data:
     jupyterhub_config.py: ""
@@ -237,7 +258,7 @@ items:
           - name: HOMEROOM_NAME
             value: ""
           - name: WORKSHOP_IMAGE
-            value: {{ workshop_dashboard_image }}
+            value: image-registry.openshift-image-registry.svc:5000/{{ workshop_spawner_project_name }}/openshift-devsecops-labguides:{{ workshop_dashboard_tag }}
           - name: WORKSHOP_MEMORY
             value: 512Mi
           - name: CONSOLE_MEMORY
