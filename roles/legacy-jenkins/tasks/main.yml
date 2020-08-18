@@ -11,6 +11,9 @@
           openshift.io/display-name: '{{ jenkins_project_display }}'
       spec: {}
 
+# https://docs.openshift.com/container-platform/4.5/openshift_images/using_images/images-other-jenkins.html#images-other-jenkins-env-var_images-other-jenkins
+# looks like the env var OVERRIDE_PV_PLUGINS_WITH_IMAGE_PLUGINS would mean that we don't have to worry as long as the default plugins are sufficient 
+
 - name: Create a Jenkins instance
   k8s:
     kubeconfig: '{{ kubeconfig }}'
