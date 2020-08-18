@@ -1,5 +1,8 @@
 ---
 - include_role:
+    name: rhsso
+  when: deploy_rhsso
+- include_role:
     name: gitea
   when: deploy_gitea
 - include_role:
