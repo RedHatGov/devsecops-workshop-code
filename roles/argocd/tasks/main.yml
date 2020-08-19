@@ -37,6 +37,15 @@
         server:
           route:
             enabled: true
+        rbac:
+          defaultPolicy: 'role:readonly'
+          policy: |
+            g, argocd-admins, role:admin
+          scopes: '[groups]'
+        dex:
+          image: quay.io/redhat-cop/dex
+          openShiftOAuth: true
+          version: v2.22.0-openshift
   register: argocd_deployment
   until: not argocd_deployment.failed
   retries: 5
