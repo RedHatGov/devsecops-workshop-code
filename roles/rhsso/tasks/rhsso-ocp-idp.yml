@@ -12,6 +12,40 @@
     definition: '{{ lookup("template", "rhsso-ocp-client.yml.j2")|from_yaml }}'
 
 - name: Create RH-SSO IdP in OpenShift
-  k8s:
+  k8s_json_patch:
     kubeconfig: '{{ kubeconfig }}'
-    definition: '{{ lookup("template", "rhsso-ocp-idp.yml.j2")|from_yaml }}'
+    api_version: config.openshift.io/v1
+    kind: OAuth
+    name: cluster
+    patch:
+      - op: add
+        path: /spec/identityProviders/[?name='{{ item.name }}']
+        value: '{{ item }}'
+  loop:
+    - name: rhsso-idp
+      challenge: true
+      login: true
+      mappingMethod: claim
+      type: OpenID
+      openID:
+        clientID: "openshift"
+        clientSecret:
+          name: keycloak-client-secret-openshift
+        extraScopes:
+        - email
+        - profile
+        extraAuthorizeParameters:
+          include_granted_scopes: "true"
+        claims:
+          preferredUsername:
+          - preferred_username
+          - email
+          name:
+          - nickname
+          - given_name
+          - name
+          email:
+          - custom_email_claim
+          - email
+        issuer: https://{{ rhsso_app_name }}-{{ rhsso_project_name }}.apps.{{ subdomain }}/auth/realms/{{ rhsso_realm_name }}
+
