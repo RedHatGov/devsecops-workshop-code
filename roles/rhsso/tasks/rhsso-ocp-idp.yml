@@ -47,5 +47,5 @@
           email:
           - custom_email_claim
           - email
-        issuer: https://{{ rhsso_app_name }}-{{ rhsso_project_name }}.apps.{{ subdomain }}/auth/realms/{{ rhsso_realm_name }}
+        issuer: https://keycloak-{{ rhsso_project_name }}.apps.{{ subdomain }}/auth/realms/{{ rhsso_realm_name }}
 
