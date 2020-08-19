@@ -3,10 +3,26 @@
   set_fact:
     use_real_certs: "{{ (AWS_ACCESS_KEY_ID is defined or ansible_env['AWS_ACCESS_KEY_ID'] is defined) | bool }}"
 
-- name: Download acme.sh
-  git:
-    repo: https://github.com/neilpang/acme.sh
+## required internet access; now treated as a template with corresponding dns_aws.sh
+#- name: Download acme.sh
+#  git:
+#    repo: https://github.com/neilpang/acme.sh
+#    dest: '{{ _tmp_parent }}/acme.sh'
+- name: Copy acme.sh template to host
+  template:
+    src: 'acme.sh.j2'
     dest: '{{ _tmp_parent }}/acme.sh'
+    mode: 0755
+
+- name: Ensure dnsapi directory exists
+  file:
+    path: '{{ _tmp_parent }}/dnsapi'
+    state: directory
+
+- name: Copy dns_aws.sh to host
+  template:
+    src: 'dns_aws.sh.j2'
+    dest: '{{ _tmp_parent }}/dnsapi/dns_aws.sh'
 
 - name: Ensure certificate directory exists
   file:
