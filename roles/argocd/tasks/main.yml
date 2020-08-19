@@ -1,0 +1,69 @@
+---
+- name: Ensure namespace exists
+  k8s:
+    kubeconfig: '{{ kubeconfig }}'
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: '{{ argocd_project_name }}'
+        annotations:
+          openshift.io/display-name: '{{ argocd_project_display }}'
+      spec: {}
+
+- name: Subscribe to Argo CD
+  k8s:
+    kubeconfig: '{{ kubeconfig }}'
+    definition: '{{ lookup("template", "argocd-operator.yml.j2")|from_yaml }}'
+
+- name: Deploy Argo CD via CR
+  k8s:
+    kubeconfig: '{{ kubeconfig }}'
+    definition:
+      apiVersion: argoproj.io/v1alpha1
+      kind: ArgoCD
+      metadata:
+        name: argocd
+        namespace: '{{ argocd_project_name }}'
+      spec:
+        grafana:
+          enabled: true
+          route:
+            enabled: true
+        prometheus:
+          enabled: true
+          route:
+            enabled: true
+        server:
+          route:
+            enabled: true
+  register: argocd_deployment
+  until: not argocd_deployment.failed
+  retries: 5
+  delay: 10
+
+- name: Wait for Argo CD route to be created by the Operator
+  k8s_info:
+    kubeconfig: '{{ kubeconfig }}'
+    api_version: route.openshift.io/v1
+    kind: Route
+    namespace: '{{ argocd_project_name }}'
+    name: argocd-server
+  register: argocd_route
+  until: argocd_route.resources|length > 0
+  retries: 10
+  delay: 30
+
+- set_fact:
+    argocd_route: '{{ argocd_route|json_query("resources[0].spec.host") }}'
+
+- name: Wait for Argo CD to respond to requests
+  uri:
+    url: 'https://{{ argocd_route }}/'
+    return_content: yes
+    validate_certs: no
+  register: argocd_endpoint
+  until: argocd_endpoint.status == 200
+  retries: 20
+  delay: 30
+
