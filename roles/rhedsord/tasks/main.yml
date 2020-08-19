@@ -6,6 +6,9 @@
     name: gitea
   when: deploy_gitea
 - include_role:
+    name: argocd
+  when: deploy_argocd
+- include_role:
     name: sonarqube
   when: deploy_sonarqube
 - include_role:
