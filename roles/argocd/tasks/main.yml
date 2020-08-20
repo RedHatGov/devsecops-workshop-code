@@ -37,6 +37,7 @@
         server:
           route:
             enabled: true
+          insecure: true
         rbac:
           defaultPolicy: 'role:readonly'
           policy: |
