@@ -30,6 +30,8 @@
           enabled: true
           route:
             enabled: true
+          image: grafana/grafana
+          version: sha256:bdef6f27255a09deb2f89741b3800a9a394a7e9eefa032570760e5688dd00a2f
         prometheus:
           enabled: true
           route:
@@ -47,6 +49,9 @@
           image: quay.io/redhat-cop/dex
           openShiftOAuth: true
           version: v2.22.0-openshift
+        redis:
+          image: redis
+          version: sha256:4be7fdb131e76a6c6231e820c60b8b12938cf1ff3d437da4871b9b2440f4e385
   register: argocd_deployment
   until: not argocd_deployment.failed
   retries: 5
