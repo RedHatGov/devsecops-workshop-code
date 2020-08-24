@@ -51,7 +51,7 @@
           version: v2.22.0-openshift
         redis:
           image: redis
-          version: sha256:4be7fdb131e76a6c6231e820c60b8b12938cf1ff3d437da4871b9b2440f4e385
+          version: sha256:b33e5a3c00e5794324fad2fab650eadba0f65e625cc915e4e57995590502c269
   register: argocd_deployment
   until: not argocd_deployment.failed
   retries: 5
