@@ -1,0 +1,8 @@
+---
+## Create test client
+
+- name: Create Test SSO Client
+  k8s:
+    kubeconfig: '{{ kubeconfig }}'
+    definition: '{{ lookup("template", "rhsso-test-client.yml.j2")|from_yaml }}'
+
