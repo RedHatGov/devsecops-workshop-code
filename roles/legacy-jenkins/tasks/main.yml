@@ -38,7 +38,7 @@
     k8s:
       kubeconfig: '{{ kubeconfig }}'
       namespace: openshift
-      definition: '{{ lookup("template", "image-stream.yml.j2")|from_yaml }}'
+      definition: '{{ lookup("template", "imagestream.yml.j2")|from_yaml }}'
 
 - name: Create a Jenkins instance
   k8s:
