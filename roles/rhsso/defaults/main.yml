@@ -18,3 +18,32 @@ postgresql_user: keycloak
 postgresql_volume_capacity: 1Gi
 postgresql_memory_limit: 512Mi
 
+generated_password: "{{ lookup('password', '../tmp/rhssopasswd.txt length=15 chars=ascii_letters') }}"
+
+# User Definition
+
+rhsso_users:
+  - username: realmadmin
+    firstName: Realm
+    lastName: Administrator
+    password: "{{ generated_password }}"
+    email: realmadmin@example.com
+    realmRoles:
+      - "offline_access"
+    clientRoles:
+      account:
+        - "manage-account"
+      realm-management:
+        - "manage-users"
+  - username: user1
+    firstName: Test1
+    lastName: user1
+    password: "{{ generated_password }}"
+    email: user1@example.com
+    realmRoles: []
+    clientRoles: 
+      account: []
+
+
+
+
