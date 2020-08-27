@@ -4,9 +4,6 @@ rhedsord_included: yes
 
 # The host and port for the disconnected registry, used to find images to create ImageStreams
 rhedsord_registry: registry.sparta.spo.io:5000
-# credentials for the registry, need to move this to vault or some such
-rhedsord_registry_username: cloudctl
-rhedsord_registry_password: cloudctl
 
 # The project from which custom Operators and other tooling will be pulled
 github_project: jharmison-redhat
