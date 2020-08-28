@@ -18,9 +18,9 @@
   when: not connected_cluster
   block:
 
-  - name: List openshift-release-dev image tags
+  - name: List Jenkins repository image tags
     uri:
-      url: 'https://{{ rhedsord_registry }}/v2/openshift-release-dev/tags/list'
+      url: 'https://{{ rhedsord_registry }}/v2/{{ jenkins_repository_name }}/tags/list'
       method: GET
       user: '{{ rhedsord_registry_username }}'
       password: '{{ rhedsord_registry_password }}'
@@ -30,7 +30,7 @@
     register: openshift_release_dev_image_tags
 
   - set_fact:
-      jenkins_image_path: '{{ rhedsord_registry }}/openshift-release-dev:{{ item }}'
+      jenkins_image_path: '{{ rhedsord_registry }}/{{ jenkins_repository_name }}:{{ item }}'
     loop: '{{ openshift_release_dev_image_tags.json.tags }}'
     when: item is match('.*jenkins$')
 
