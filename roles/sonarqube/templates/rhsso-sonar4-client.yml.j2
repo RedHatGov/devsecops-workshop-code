@@ -18,8 +18,8 @@
       clientAuthenticatorType: client-secret
       publicClient: false
       redirectUris:
-        - 'https://sonarqube-devsecops.apps.{{ subdomain }}/oauth2/callback/saml'
-      rootUrl: 'https://sonarqube-devsecops.apps.{{ subdomain }}/'
+        - 'https://sonarqube-{{ sonarqube_project_name }}.apps.{{ subdomain }}/oauth2/callback/saml'
+      rootUrl: 'https://sonarqube-{{ sonarqube_project_name }}.apps.{{ subdomain }}/'
       protocol: saml
       attributes:
         saml.authnstatement: 'true' 
