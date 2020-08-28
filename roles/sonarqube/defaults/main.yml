@@ -5,3 +5,5 @@ sonarqube_password: '{{ lookup("password", tmp_dir + "/sonarqube.password chars=
 
 rhsso_realm_name: openshift
 rhsso_project_name: rhsso
+rhsso_app_label: rhsso
+subdomain: '{{ full_cluster_name }}'
