@@ -52,3 +52,7 @@
   until: not sq_deployment.failed
   retries: 5
   delay: 10
+
+
+- name: Include SSO configuration tasks
+  include: sonarqube_rhsso.yml
