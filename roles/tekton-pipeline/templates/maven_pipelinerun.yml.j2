@@ -10,15 +10,15 @@
     pipelineRef:
       name: build-test-deploy-app-to-dev
     resources:
-      - name: app-git
-        resourceRef:
-          name: source
+    - name: app-git
+      resourceRef:
+        name: source
     serviceAccountName: pipeline
     timeout: 1h0m0s
     workspaces:
-      - name: local-maven-repo
-        persistentVolumeClaim:
-          claimName: maven-repo-pvc
+    - name: local-maven-repo
+      persistentVolumeClaim:
+        claimName: maven-repo-pvc
 
 - apiVersion: tekton.dev/v1alpha1
   kind: PipelineRun
@@ -31,12 +31,12 @@
     pipelineRef:
       name: app-s2i-build
     resources:
-      - name: app-git
-        resourceRef:
-          name: source
-      - name: app-image
-        resourceRef:
-          name: internal-reg-image
+    - name: app-git
+      resourceRef:
+        name: source
+    - name: app-image
+      resourceRef:
+        name: internal-reg-image
     serviceAccountName: pipeline
     timeout: 1h0m0s
 {% endfor %}

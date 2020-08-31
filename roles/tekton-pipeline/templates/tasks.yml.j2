@@ -132,7 +132,7 @@
     params:
     - name: GOALS
       default:
-        - package
+      - package
       description: maven goals to run
       type: array
     - name: settings-path
@@ -146,10 +146,10 @@
     steps:
     - name: mvn-goals
       args:
-        - $(params.GOALS)
-        - '-s$(inputs.resources.source.path)/$(params.settings-path)'
+      - $(params.GOALS)
+      - '-s$(inputs.resources.source.path)/$(params.settings-path)'
       command:
-        - /usr/bin/mvn
+      - /usr/bin/mvn
       image: 'gcr.io/cloud-builders/mvn:3.5.0-jdk-8'
       resources: {}
     workspaces:
