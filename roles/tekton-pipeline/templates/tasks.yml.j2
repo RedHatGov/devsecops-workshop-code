@@ -367,11 +367,9 @@
             buildah mount --storage-driver vfs $container_id
             echo "Running oscap-chroot scan"
             oscap-chroot $(buildah --storage-driver vfs mount | awk '{print $2}') xccdf eval --profile $(inputs.params.xccdfProfile) --report $(workspaces.report.path)/report.html $(inputs.params.oscapProfilePath)
-            #oscap-chroot $(buildah --storage-driver vfs mount | awk '{print $2}') xccdf eval --profile $(inputs.params.xccdfProfile) --report /tmp/report.html $(inputs.params.oscapProfilePath)
             echo "Displaying contents of $(workspaces.report.path)/report.html"
             echo "********** START OF report.html **********"
             cat $(workspaces.report.path)/report.html
-            #cat /tmp/report.html
             echo "********** END OF report.html ************"
 {# END new task breakout #}
 - apiVersion: tekton.dev/v1beta1
