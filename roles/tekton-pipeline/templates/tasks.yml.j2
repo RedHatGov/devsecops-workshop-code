@@ -234,7 +234,36 @@
           oc tag $(params.app_name):latest  $(params.app_name):$GITSHA -n $(params.dev_project) 
 
           echo "Successfully created container image $(params.dev_project)/$(params.app_name):$GITSHA"
-      - name: deploy-app-from-image
+    workspaces:
+      - name: maven-repo
+
+
+# new task breakout
+- apiVersion: tekton.dev/v1beta1
+  kind: Task
+  metadata:
+    name: deploy-app-from-image
+    namespace: {{ username }}-cicd
+  spec:
+    params:
+      - default: tasks
+        description: The name of the app
+        name: app_name
+        type: string
+      - default: {{ username }}-dev
+        description: The name dev project
+        name: dev_project
+        type: string
+      - description: binary artifact path in the local artifact repo
+        # something like org/jboss/quickstarts/eap/jboss-tasks-rs/7.0.0-SNAPSHOT/jboss-tasks-rs-7.0.0-SNAPSHOT.war
+        type: string
+        name: artifact_path
+    resources:
+      inputs:
+        - name: source
+          type: git
+    steps:
+      - name: deploy
         image: 'quay.io/openshift/origin-cli:latest'            
         script: >
           #!/bin/sh
@@ -259,14 +288,39 @@
           fi
             
           oc rollout latest dc/$(params.app_name) -n  $(params.dev_project)
+    workspaces:
+      - name: maven-repo
 
-      - name: announce-success
+- apiVersion: tekton.dev/v1beta1
+  kind: Task
+  metadata:
+    name: announce-success
+    namespace: {{ username }}-cicd
+  spec:
+    params:
+      - default: tasks
+        description: The name of the app
+        name: app_name
+        type: string
+      - default: {{ username }}-dev
+        description: The name dev project
+        name: dev_project
+        type: string
+      - description: binary artifact path in the local artifact repo
+        # something like org/jboss/quickstarts/eap/jboss-tasks-rs/7.0.0-SNAPSHOT/jboss-tasks-rs-7.0.0-SNAPSHOT.war
+        type: string
+        name: artifact_path
+    resources:
+      inputs:
+        - name: source
+          type: git
+    steps:
+      - name: announce
         image: 'gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:latest'      
         script: >
           #!/bin/sh
 
           set -e -o pipefail
-
 
           GITSHA=$(cat
           $(inputs.resources.source.path)/$(params.app_name)-gitsha.txt) 
@@ -279,6 +333,7 @@
         workingDir: $(inputs.resources.source.path)
     workspaces:
       - name: maven-repo
+# End new task
 
 - apiVersion: tekton.dev/v1beta1
   kind: Task
