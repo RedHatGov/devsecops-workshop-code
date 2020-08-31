@@ -6,35 +6,36 @@
     namespace: {{ username }}-cicd
   spec:
     params:
-    - default: .
+    - name: PATH_CONTEXT
+      default: .
       description: The location of the path to run s2i from
-      name: PATH_CONTEXT
       type: string
-    - default: "true"
+    - name: TLSVERIFY
+      default: "true"
       description: Verify the TLS on the registry endpoint (for push/pull to a non-TLS registry)
-      name: TLSVERIFY
       type: string
-    - default: ""
+    - name: MAVEN_ARGS_APPEND
+      default: ""
       description: Additional Maven arguments
-      name: MAVEN_ARGS_APPEND
       type: string
-    - default: "false"
+    - name: MAVEN_CLEAR_REPO
+      default: "false"
       description: Remove the Maven repository after the artifact is built
-      name: MAVEN_CLEAR_REPO
       type: string
-    - default: ""
+    - name: MAVEN_MIRROR_URL
+      default: ""
       description: The base URL of a mirror used for retrieving artifacts
-      name: MAVEN_MIRROR_URL
       type: string
     resources:
       inputs:
       - name: source
         type: git
       outputs:
-        - name: image
-          type: image
+      - name: image
+        type: image
     steps:
-    - args:
+    - name: gen-env-file
+      args:
       - |-
         echo "MAVEN_CLEAR_REPO=$(params.MAVEN_CLEAR_REPO)" > env-file
 
@@ -52,13 +53,13 @@
       - /bin/sh
       - -c
       image: quay.io/openshift-pipeline/s2i
-      name: gen-env-file
       resources: {}
       volumeMounts:
       - mountPath: /env-params
         name: envparams
       workingDir: /env-params
-    - command:
+    - name: generate
+      command:
       - s2i
       - build
       - $(params.PATH_CONTEXT)
@@ -72,7 +73,6 @@
       - --environment-file
       - /env-params/env-file
       image: quay.io/openshift-pipeline/s2i
-      name: generate
       resources: {}
       volumeMounts:
       - mountPath: /gen-source
@@ -80,7 +80,8 @@
       - mountPath: /env-params
         name: envparams
       workingDir: /workspace/source
-    - command:
+    - name: build
+      command:
       - buildah
       - bud
       - --tls-verify=$(params.TLSVERIFY)
@@ -91,37 +92,36 @@
       - $(outputs.resources.image.url)
       - .
       image: quay.io/buildah/stable
-      name: build
       resources: {}
       securityContext:
         privileged: true
       volumeMounts:
-      - mountPath: /var/lib/containers
-        name: varlibcontainers
-      - mountPath: /gen-source
-        name: gen-source
+      - name: varlibcontainers
+        mountPath: /var/lib/containers
+      - name: gen-source
+        mountPath: /gen-source
       workingDir: /gen-source
-    - command:
+    - name: push
+      command:
       - buildah
       - push
       - --tls-verify=$(params.TLSVERIFY)
       - $(outputs.resources.image.url)
       - docker://$(outputs.resources.image.url)
       image: quay.io/buildah/stable
-      name: push
       resources: {}
       securityContext:
         privileged: true
       volumeMounts:
-      - mountPath: /var/lib/containers
-        name: varlibcontainers
+      - name: varlibcontainers
+        mountPath: /var/lib/containers
     volumes:
-    - emptyDir: {}
-      name: varlibcontainers
-    - emptyDir: {}
-      name: gen-source
-    - emptyDir: {}
-      name: envparams
+    - name: varlibcontainers
+      emptyDir: {}
+    - name: gen-source
+      emptyDir: {}
+    - name: envparams
+      emptyDir: {}
 
 - apiVersion: tekton.dev/v1beta1
   kind: Task
@@ -130,30 +130,30 @@
     namespace: {{ username }}-cicd
   spec:
     params:
-      - default:
-          - package
-        description: maven goals to run
-        name: GOALS
-        type: array
-      - default: configuration/cicd-settings-nexus3.xml
-        description: location of the settings file
-        name: settings-path
-        type: string
+    - name: GOALS
+      default:
+        - package
+      description: maven goals to run
+      type: array
+    - name: settings-path
+      default: configuration/cicd-settings-nexus3.xml
+      description: location of the settings file
+      type: string
     resources:
       inputs:
-        - name: source
-          type: git
+      - name: source
+        type: git
     steps:
-      - args:
-          - $(params.GOALS)
-          - '-s$(inputs.resources.source.path)/$(params.settings-path)'
-        command:
-          - /usr/bin/mvn
-        image: 'gcr.io/cloud-builders/mvn:3.5.0-jdk-8'
-        name: mvn-goals
-        resources: {}
+    - name: mvn-goals
+      args:
+        - $(params.GOALS)
+        - '-s$(inputs.resources.source.path)/$(params.settings-path)'
+      command:
+        - /usr/bin/mvn
+      image: 'gcr.io/cloud-builders/mvn:3.5.0-jdk-8'
+      resources: {}
     workspaces:
-      - name: maven-repo
+    - name: maven-repo
 
 - apiVersion: tekton.dev/v1beta1
   kind: Task
@@ -162,80 +162,81 @@
     namespace: {{ username }}-cicd
   spec:
     params:
-      - default: tasks
-        description: The name of the app
-        name: app_name
-        type: string
-      - default: {{ username }}-dev
-        description: The name dev project
-        name: dev_project
-        type: string
-      - description: binary artifact path in the local artifact repo
-        # something like org/jboss/quickstarts/eap/jboss-tasks-rs/7.0.0-SNAPSHOT/jboss-tasks-rs-7.0.0-SNAPSHOT.war
-        type: string
-        name: artifact_path
+    - name: app_name
+      default: tasks
+      description: The name of the app
+      type: string
+    - name: dev_project
+      default: {{ username }}-dev
+      description: The name dev project
+      type: string
+    - name: artifact_path
+      description: binary artifact path in the local artifact repo
+      # something like org/jboss/quickstarts/eap/jboss-tasks-rs/7.0.0-SNAPSHOT/jboss-tasks-rs-7.0.0-SNAPSHOT.war
+      type: string
     resources:
       inputs:
-        - name: source
-          type: git
+      - name: source
+        type: git
     steps:
-      - name: extract-git-rev
-        image: 'gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:latest'
-        script: >
-          #!/bin/sh
+    - name: extract-git-rev
+      image: 'gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:latest'
+      script: >
+        #!/bin/sh
 
-          set -e -o pipefail
+        set -e -o pipefail
 
-          # get git sha
+        # get git sha
 
-          git rev-parse --verify --short HEAD | tee
-          $(inputs.resources.source.path)/$(params.app_name)-gitsha.txt
-        workingDir: $(inputs.resources.source.path)
-      - name: create-build-config
-        image: 'quay.io/openshift/origin-cli:latest'
-        script: >
-          #!/bin/sh
+        git rev-parse --verify --short HEAD | tee
+        $(inputs.resources.source.path)/$(params.app_name)-gitsha.txt
+      workingDir: $(inputs.resources.source.path)
+    - name: create-build-config
+      image: 'quay.io/openshift/origin-cli:latest'
+      script: >
+        #!/bin/sh
 
-          set -e -o pipefail
+        set -e -o pipefail
 
-          echo "Creating new build config"
+        echo "Creating new build config"
 
-          GITSHA=$(cat
-          $(inputs.resources.source.path)/$(params.app_name)-gitsha.txt)
-
-
-          echo "Extracted git revision from previous step $GITSHA"
-
-          # This allows the new build to be created whether it exists or not
-
-          oc new-build -o yaml --name=$(params.app_name) --image-stream=jboss-eap72-openshift:1.1  --binary=true -n
-          $(params.dev_project) | oc apply -n $(params.dev_project) -f -
-      - name: build-app-image
-        image: 'quay.io/openshift/origin-cli:latest'
-        script: >
-          #!/bin/sh
-
-          set -e -o pipefail
-
-          echo "Start the openshift build"
+        GITSHA=$(cat
+        $(inputs.resources.source.path)/$(params.app_name)-gitsha.txt)
 
 
-          rm -rf $(inputs.resources.source.path)/oc-build && mkdir -p $(inputs.resources.source.path)/oc-build/deployments
+        echo "Extracted git revision from previous step $GITSHA"
+
+        # This allows the new build to be created whether it exists or not
+
+        oc new-build -o yaml --name=$(params.app_name) --image-stream=jboss-eap72-openshift:1.1  --binary=true -n
+        $(params.dev_project) | oc apply -n $(params.dev_project) -f -
+    - name: build-app-image
+      image: 'quay.io/openshift/origin-cli:latest'
+      script: >
+        #!/bin/sh
+
+        set -e -o pipefail
+
+        echo "Start the openshift build"
 
 
-          cp $(workspaces.maven-repo.path)/$(params.artifact_path) $(inputs.resources.source.path)/oc-build/deployments/ROOT.war
+        rm -rf $(inputs.resources.source.path)/oc-build && mkdir -p $(inputs.resources.source.path)/oc-build/deployments
 
 
-          oc start-build $(params.app_name) --from-dir=$(inputs.resources.source.path)/oc-build -n   $(params.dev_project) --wait=true
-
-          GITSHA=$(cat $(inputs.resources.source.path)/$(params.app_name)-gitsha.txt)
+        cp $(workspaces.maven-repo.path)/$(params.artifact_path) $(inputs.resources.source.path)/oc-build/deployments/ROOT.war
 
 
-          oc tag $(params.app_name):latest  $(params.app_name):$GITSHA -n $(params.dev_project)
+        oc start-build $(params.app_name) --from-dir=$(inputs.resources.source.path)/oc-build -n   $(params.dev_project) --wait=true
 
-          echo "Successfully created container image $(params.dev_project)/$(params.app_name):$GITSHA"
+        GITSHA=$(cat $(inputs.resources.source.path)/$(params.app_name)-gitsha.txt)
+
+
+        oc tag $(params.app_name):latest  $(params.app_name):$GITSHA -n $(params.dev_project)
+
+        echo "Successfully created container image $(params.dev_project)/$(params.app_name):$GITSHA"
     workspaces:
-      - name: maven-repo
+    - name: maven-repo
+
 {# Start new tasks breakout:
     TODO
     ------
@@ -250,6 +251,7 @@
       when they were `steps`
     - Add oscap-image-scan task to pipeline
 #}
+
 - apiVersion: tekton.dev/v1beta1
   kind: Task
   metadata:
@@ -257,46 +259,47 @@
     namespace: {{ username }}-cicd
   spec:
     params:
-      - default: tasks
-        description: The name of the app
-        name: app_name
-        type: string
-      - default: {{ username }}-dev
-        description: The name dev project
-        name: dev_project
-        type: string
+    - name: app_name
+      default: tasks
+      description: The name of the app
+      type: string
+    - name: dev_project
+      default: {{ username }}-dev
+      description: The name dev project
+      type: string
     resources:
       inputs:
-        - name: source
-          type: git
+      - name: source
+        type: git
     steps:
-      - name: deploy
-        image: 'quay.io/openshift/origin-cli:latest'
-        script: >
-          #!/bin/sh
+    - name: deploy
+      image: 'quay.io/openshift/origin-cli:latest'
+      script: >
+        #!/bin/sh
 
-          set -e -o pipefail
+        set -e -o pipefail
 
-          echo "Create new app from tasks image stream in $(params.dev_project) project"
+        echo "Create new app from tasks image stream in $(params.dev_project) project"
 
-          GITSHA=$(cat $(inputs.resources.source.path)/$(params.app_name)-gitsha.txt)
+        GITSHA=$(cat $(inputs.resources.source.path)/$(params.app_name)-gitsha.txt)
 
-          oc new-app --image-stream=$(params.app_name):$GITSHA -n
-          $(params.dev_project) --as-deployment-config=true -o yaml | oc apply -n $(params.dev_project)  -f -
+        oc new-app --image-stream=$(params.app_name):$GITSHA -n
+        $(params.dev_project) --as-deployment-config=true -o yaml | oc apply -n $(params.dev_project)  -f -
 
-          echo "Setting manual triggers on deployment $(params.app_name)"
+        echo "Setting manual triggers on deployment $(params.app_name)"
 
-          oc set triggers dc/$(params.app_name) --manual=true -n  $(params.dev_project)
+        oc set triggers dc/$(params.app_name) --manual=true -n  $(params.dev_project)
 
-          if ! oc get route/$(params.app_name) -n $(params.dev_project) ; then
+        if ! oc get route/$(params.app_name) -n $(params.dev_project) ; then
 
-            oc expose svc $(params.app_name) -n $(params.dev_project) || echo "Failed to create route for $(params.app_name)"
+          oc expose svc $(params.app_name) -n $(params.dev_project) || echo "Failed to create route for $(params.app_name)"
 
-          fi
+        fi
 
-          oc rollout latest dc/$(params.app_name) -n  $(params.dev_project)
+        oc rollout latest dc/$(params.app_name) -n  $(params.dev_project)
     workspaces:
-      - name: maven-repo
+    - name: maven-repo
+
 - apiVersion: tekton.dev/v1beta1
   kind: Task
   metadata:
@@ -304,33 +307,34 @@
     namespace: {{ username }}-cicd
   spec:
     params:
-      - default: tasks
-        description: The name of the app
-        name: app_name
-        type: string
+    - name: app_name
+      default: tasks
+      description: The name of the app
+      type: string
     resources:
       inputs:
-        - name: source
-          type: git
+      - name: source
+        type: git
     steps:
-      - name: announce
-        image: 'gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:latest'
-        script: >
-          #!/bin/sh
+    - name: announce
+      image: 'gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:latest'
+      script: >
+        #!/bin/sh
 
-          set -e -o pipefail
+        set -e -o pipefail
 
-          GITSHA=$(cat
-          $(inputs.resources.source.path)/$(params.app_name)-gitsha.txt)
-          &&
+        GITSHA=$(cat
+        $(inputs.resources.source.path)/$(params.app_name)-gitsha.txt)
+        &&
 
-          echo "Successfully build application $(params.app_name)"
+        echo "Successfully build application $(params.app_name)"
 
-          echo "After testing the app, run the deploy-app-to-stage pipeline with
-          $GITSHA as the app_version parameter"
-        workingDir: $(inputs.resources.source.path)
+        echo "After testing the app, run the deploy-app-to-stage pipeline with
+        $GITSHA as the app_version parameter"
+      workingDir: $(inputs.resources.source.path)
     workspaces:
-      - name: maven-repo
+    - name: maven-repo
+
 - apiVersion: tekton.dev/v1beta1
   kind: Task
   metadata:
@@ -353,27 +357,27 @@
     - name: report
       description: Storage for oscap report.html generated by oscap-chroot scan
     steps:
-      - name: scan-image
-        securityContext:
-          privileged: true
-        image: quay.io/redhatgov/image-scanner@sha256:cdc3713816e1d5d70a9cf43d2ffcfc45e7862e2004aa978bdb7a1a594ca8de9e
-        command: ['/bin/bash']
-        args:
-          - -c
-          - |
-            echo "Pulling image $(inputs.params.container-image-url)"
-            buildah from --storage-driver vfs docker://$(inputs.params.container-image-url):$(inputs.params.container-imagetag)
-            container_id=$(buildah --storage-driver vfs containers -q)
-            echo "Container ID: $container_id"
-            echo "Mounting the container..."
-            buildah mount --storage-driver vfs $container_id
-            echo "Running oscap-chroot scan"
-            oscap-chroot $(buildah --storage-driver vfs mount | awk '{print $2}') xccdf eval --profile $(inputs.params.xccdfProfile) --report $(workspaces.report.path)/report.html $(inputs.params.oscapProfilePath)
-            echo "Displaying contents of $(workspaces.report.path)/report.html"
-            echo "********** START OF report.html **********"
-            cat $(workspaces.report.path)/report.html
-            echo "********** END OF report.html ************"
-{# END new task breakout #}
+    - name: scan-image
+      securityContext:
+        privileged: true
+      image: quay.io/redhatgov/image-scanner@sha256:cdc3713816e1d5d70a9cf43d2ffcfc45e7862e2004aa978bdb7a1a594ca8de9e
+      command: ['/bin/bash']
+      args:
+      - -c
+      - |
+        echo "Pulling image $(inputs.params.container-image-url)"
+        buildah from --storage-driver vfs docker://$(inputs.params.container-image-url):$(inputs.params.container-imagetag)
+        container_id=$(buildah --storage-driver vfs containers -q)
+        echo "Container ID: $container_id"
+        echo "Mounting the container..."
+        buildah mount --storage-driver vfs $container_id
+        echo "Running oscap-chroot scan"
+        oscap-chroot $(buildah --storage-driver vfs mount | awk '{print $2}') xccdf eval --profile $(inputs.params.xccdfProfile) --report $(workspaces.report.path)/report.html $(inputs.params.oscapProfilePath)
+        echo "Displaying contents of $(workspaces.report.path)/report.html"
+        echo "********** START OF report.html **********"
+        cat $(workspaces.report.path)/report.html
+        echo "********** END OF report.html ************"
+
 - apiVersion: tekton.dev/v1beta1
   kind: Task
   metadata:
@@ -381,21 +385,21 @@
     namespace: {{ username }}-cicd
   spec:
     params:
-      - default: tasks
-        description: The name of the app
-        name: app_name
-        type: string
-      - default: user1-dev
-        description: The name dev project
-        name: dev_project
-        type: string
-      - default: user1-stage
-        description: The name dev project
-        name: stage_project
-        type: string
-      - description: The name dev project
-        name: app_revision
-        type: string
+    - name: app_name
+      default: tasks
+      description: The name of the app
+      type: string
+    - name: dev_project
+      default: user1-dev
+      description: The name dev project
+      type: string
+    - name: stage_project
+      default: user1-stage
+      description: The name dev project
+      type: string
+    - name: app_revision
+      description: The name dev project
+      type: string
     steps:
     - name: cleanup-stage-project
       script: >
