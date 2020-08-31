@@ -54,7 +54,22 @@
         workspaces:
           - name: maven-repo
             workspace: local-maven-repo
-
+      - name: oscap-scan-image
+        taskRef:
+          kind: Task
+          name: oscap-image-scan
+        params:
+          - name: xccdfProfile
+            value: xccdf_org.ssgproject.content_profile_standard
+          - name: oscapProfilePath
+            value: /usr/share/xml/scap/ssg/content/ssg-centos7-ds-1.2.xml
+          - name: container-imagetag
+            value: "latest"
+          - name: container-image-url
+            value: "quay.io/mbach/rstudio-centos7" #TODO - set the built mvn image name here?
+        workspaces:
+          - name: report
+            workspace: report #TODO - Check workspace is created
       - name: run-unit-tests
         taskRef:
           kind: Task

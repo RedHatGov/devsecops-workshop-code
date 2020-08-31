@@ -239,14 +239,16 @@
 {# Start new tasks breakout:
     TODO
     ------
-    Modify pipeline to consume the new tasks 
+    - Modify pipeline to consume the new tasks 
+    - Inject pvc for `report` workspace for oscap-image-scan task
     -------
     Done
     -------
+    - breakout steps `deploy-app-from-image` and `announce-success` from parent task
     - check for unused params in `deploy-app-from-image` and `announce-success` `tasks`
-    Both of these `tasks` include literal copies of the `spec` from their previous `tasks`
-    when they were `steps`
-    - Add oscap-image-scan task
+      Both of these `tasks` include literal copies of the `spec` from their previous `tasks`
+      when they were `steps`
+    - Add oscap-image-scan task to pipeline
 #}
 - apiVersion: tekton.dev/v1beta1
   kind: Task
