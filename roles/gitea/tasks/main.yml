@@ -17,8 +17,9 @@
     api_version: packages.operators.coreos.com/v1
     kind: PackageManifest
     namespace: openshift-marketplace
-    name: gitea_package_manifest
-  until: gitea_package_manifest.resources|length > 0 and (gitea_package_manifest.resources|first).status..catalogSource == "redhatgov-operators"
+    name: gitea-operator
+  register: gitea_package_manifest
+  until: gitea_package_manifest.resources|length > 0 and (gitea_package_manifest.resources|first).status.catalogSource == "redhatgov-operators"
   retries: 5
   delay: 10
 
@@ -32,15 +33,20 @@
     kubeconfig: '{{ kubeconfig }}'
     namespace: '{{ gitea_project_name }}'
     definition:
-      apiVersion: gpte.opentlc.com/v1alpha1
+      apiVersion: redhatgov.io/v1alpha1
       kind: Gitea
       metadata:
-        name: gitea-server
+        name: gitea
       spec:
-        postgresqlVolumeSize: 4Gi
-        giteaVolumeSize: 4Gi
-        giteaSsl: True
-        giteaName: gitea
+        gitea:
+          expose:
+            kind: Route
+            ssl: true
+            uri: gitea-devsecops.apps.cluster-24c2.24c2.example.opentlc.com
+          volumeSize: 4Gi
+        persistent: true
+        postgresql:
+          volumeSize: 4Gi
   register: gitea_deployment
   until: not gitea_deployment.failed
   retries: 5
