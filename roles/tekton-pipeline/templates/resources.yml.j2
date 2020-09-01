@@ -49,4 +49,18 @@
         storage: 5G
     volumeMode: Filesystem
     persistentVolumeReclaimPolicy: Retain
+
+- kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata:
+    name: oscap-report
+    namespace: {{ username }}-cicd
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1G
+    volumeMode: Filesystem
+    persistentVolumeReclaimPolicy: Retain
 {% endfor %}
