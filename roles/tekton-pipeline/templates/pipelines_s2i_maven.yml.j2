@@ -27,22 +27,6 @@
       workspaces:
       - name: maven-repo
         workspace: local-maven-repo
-    - name: oscap-scan-image
-      taskRef:
-        kind: Task
-        name: oscap-image-scan
-      params:
-      - name: xccdfProfile
-        value: xccdf_org.ssgproject.content_profile_standard
-      - name: oscapProfilePath
-        value: /usr/share/xml/scap/ssg/content/ssg-centos7-ds-1.2.xml
-      - name: container-imagetag
-        value: "latest"
-      - name: container-image-url
-        value: "quay.io/mbach/rstudio-centos7" #TODO - set the built mvn image name here?
-      workspaces:
-      - name: report
-        workspace: report #TODO - Check workspace is created
     - name: run-unit-tests
       taskRef:
         kind: Task
@@ -106,10 +90,10 @@
       runAfter:
       - run-unit-tests
       - code-quality-analysis
-    - name: deploy-to-openshift
+    - name: build-app-image
       taskRef:
         kind: Task
-        name: deploy-jboss-app-to-dev
+        name: build-jboss-app-image
       params:
       - name: app_name
         value: tasks
@@ -124,8 +108,27 @@
         workspace: local-maven-repo
       runAfter:
       - archive-app-to-nexus
+    - name: oscap-scan-image
+      taskRef:
+        kind: Task
+        name: oscap-image-scan
+      params:
+      - name: oscapProfilePath
+        value: /usr/share/xml/scap/ssg/content/ssg-rhel7-ds-1.2.xml
+      - name: xccdfProfile
+        value: xccdf_org.ssgproject.content_profile_rhelh-stig
+      workspaces:
+      - name: oscap-report
+        workspace: oscap-report
+      runAfter:
+      - build-app-image
+    - name: deploy-imagestream-to-dev
+      taskRef:
+        kind: Task
+        name: deploy-app-from-imagestream
     workspaces:
     - name: local-maven-repo
+    - name: oscap-report
 
 - apiVersion: tekton.dev/v1alpha1
   kind: Pipeline
@@ -134,22 +137,18 @@
     namespace: {{ username }}-cicd
   spec:
     params:
-    - default: ''
+    - name: app_revision
+      default: ''
       description: App version to deploy
-      name: app_version
       type: string
     tasks:
     - name: deploy-app-to-stage
       taskRef:
         kind: Task
-        name: deploy-app-to-stage
+        name: deploy-app-from-imagestream
       params:
-      - name: app_name
-        value: tasks
-      - name: dev_project
-        value: {{username}}-dev
-      - name: stage_project
-        value: {{username}}-stage
+      - name: dst_project
+        value: {{ username }}-stage
       - name: app_revision
-        value: $(params.app_version)
+        value: $(params.app_revision)
 {% endfor %}
