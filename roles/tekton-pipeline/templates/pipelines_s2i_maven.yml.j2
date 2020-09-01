@@ -108,7 +108,7 @@
         workspace: local-maven-repo
       runAfter:
       - archive-app-to-nexus
-    - name: oscap-scan-image
+    - name: oscap-image-scan
       taskRef:
         kind: Task
         name: oscap-image-scan
@@ -126,6 +126,8 @@
       taskRef:
         kind: Task
         name: deploy-app-from-imagestream
+      runAfter:
+      - oscap-image-scan
     workspaces:
     - name: local-maven-repo
     - name: oscap-report
