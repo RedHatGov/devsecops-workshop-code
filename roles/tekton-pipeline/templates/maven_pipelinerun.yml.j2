@@ -19,24 +19,7 @@
     - name: local-maven-repo
       persistentVolumeClaim:
         claimName: maven-repo-pvc
-
-- apiVersion: tekton.dev/v1alpha1
-  kind: PipelineRun
-  metadata:
-    labels:
-      tekton.dev/pipeline: app-s2i-build
-    name: app-s2i-build-1
-    namespace: {{ username }}-cicd
-  spec:
-    pipelineRef:
-      name: app-s2i-build
-    resources:
-    - name: app-git
-      resourceRef:
-        name: source
-    - name: app-image
-      resourceRef:
-        name: internal-reg-image
-    serviceAccountName: pipeline
-    timeout: 1h0m0s
+    - name: oscap-report
+      persistentVolumeClaim:
+        claimName: oscap-report
 {% endfor %}

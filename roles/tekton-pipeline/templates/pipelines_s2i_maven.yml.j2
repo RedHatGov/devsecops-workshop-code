@@ -2,33 +2,6 @@
 - apiVersion: tekton.dev/v1alpha1
   kind: Pipeline
   metadata:
-    name: app-s2i-build
-    namespace: {{ username }}-cicd
-  spec:
-    resources:
-    - name: app-git
-      type: git
-    - name: app-image
-      type: image
-    tasks:
-    - name: build-app
-      taskRef:
-        name: s2i-eap-7
-        kind: Task
-      params:
-      - name: TLSVERIFY
-        value: 'false'
-      resources:
-        inputs:
-        - name: source
-          resource: app-git
-        outputs:
-        - name: image
-          resource: app-image
-
-- apiVersion: tekton.dev/v1alpha1
-  kind: Pipeline
-  metadata:
     name: build-test-deploy-app-to-dev
     namespace: {{ username }}-cicd
   spec:
