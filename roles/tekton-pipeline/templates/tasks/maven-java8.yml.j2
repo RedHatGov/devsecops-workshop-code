@@ -1,0 +1,33 @@
+{% for username in workshop_users|json_query("[].username") %}
+- apiVersion: tekton.dev/v1beta1
+  kind: Task
+  metadata:
+    name: maven-java8
+    namespace: {{ username }}-cicd
+  spec:
+    params:
+    - name: GOALS
+      default:
+      - package
+      description: maven goals to run
+      type: array
+    - name: settings-path
+      default: configuration/cicd-settings-nexus3.xml
+      description: location of the settings file
+      type: string
+    resources:
+      inputs:
+      - name: source
+        type: git
+    steps:
+    - name: mvn-goals
+      args:
+      - $(params.GOALS)
+      - '-s$(inputs.resources.source.path)/$(params.settings-path)'
+      command:
+      - /usr/bin/mvn
+      image: 'gcr.io/cloud-builders/mvn:3.5.0-jdk-8'
+      resources: {}
+    workspaces:
+    - name: maven-repo
+{% endfor %}

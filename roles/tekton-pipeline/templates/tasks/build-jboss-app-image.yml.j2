@@ -1,0 +1,70 @@
+{% for username in workshop_users|json_query("[].username") %}
+- apiVersion: tekton.dev/v1beta1
+  kind: Task
+  metadata:
+    name: build-jboss-app-image
+    namespace: {{ username }}-cicd
+  spec:
+    params:
+    - name: app_name
+      default: tasks
+      description: The name of the app
+      type: string
+    - name: project
+      default: {{ username }}-cicd
+      description: The name of the project for the build/imagestream
+      type: string
+    - name: artifact_path
+      description: binary artifact path in the local artifact repo
+      # something like org/jboss/quickstarts/eap/jboss-tasks-rs/7.0.0-SNAPSHOT/jboss-tasks-rs-7.0.0-SNAPSHOT.war
+      type: string
+    resources:
+      inputs:
+      - name: source
+        type: git
+    steps:
+    - name: extract-git-rev
+      image: 'gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:latest'
+      script: |
+        #!/bin/sh
+        set -e -o pipefail
+        git rev-parse --verify --short HEAD | tee $(inputs.resources.source.path)/$(params.app_name)-gitsha.txt
+      workingDir: $(inputs.resources.source.path)
+    - name: create-build-config-and-configmap
+      image: 'quay.io/openshift/origin-cli:latest'
+      script: |
+        #!/bin/sh
+        set -e -o pipefail
+
+        GITSHA=$(cat $(inputs.resources.source.path)/$(params.app_name)-gitsha.txt)
+        echo "Extracted git revision from previous step $GITSHA"
+
+        # This allows the new build to be created whether it exists or not
+        echo "Creating new build config"
+        oc new-build -o yaml --name=$(params.app_name) --image-stream=jboss-eap72-openshift:1.1 --binary=true -n $(params.project) | oc apply -n $(params.project) -f -
+
+        # This saves the GITSHA to a configmap for use in later tasks
+        if oc get configmap tekton-current-revision -n $(params.project); then
+          echo "Deleting old git revision configmap"
+          oc delete configmap tekton-current-revision -n $(params.project)
+        fi
+
+        echo "Creating configmap with git revision"
+        oc create configmap tekton-current-revision -n $(params.project) --from-literal=revision=$GITSHA
+    - name: build-app-image
+      image: 'quay.io/openshift/origin-cli:latest'
+      script: |
+        #!/bin/sh
+        set -e -o pipefail
+
+        echo "Start the openshift build"
+        rm -rf $(inputs.resources.source.path)/oc-build && mkdir -p $(inputs.resources.source.path)/oc-build/deployments
+        cp $(workspaces.maven-repo.path)/$(params.artifact_path) $(inputs.resources.source.path)/oc-build/deployments/ROOT.war
+        oc start-build $(params.app_name) --from-dir=$(inputs.resources.source.path)/oc-build -n $(params.project) --wait=true
+
+        GITSHA=$(cat $(inputs.resources.source.path)/$(params.app_name)-gitsha.txt)
+        oc tag $(params.app_name):latest  $(params.app_name):$GITSHA -n $(params.project)
+        echo "Successfully created container image $(params.project)/$(params.app_name):$GITSHA"
+    workspaces:
+    - name: maven-repo
+{% endfor %}
