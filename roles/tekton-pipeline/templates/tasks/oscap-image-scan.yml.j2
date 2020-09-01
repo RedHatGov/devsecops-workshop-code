@@ -30,17 +30,18 @@
       command: ['/bin/bash']
       args:
       - -c
-      - |
-        echo "Pulling image $(inputs.params.container-image-url)"
-        buildah from --storage-driver vfs docker://$(inputs.params.container-image-url):$(inputs.params.container-imagetag)
-        container_id=$(buildah --storage-driver vfs containers -q)
-        echo "Container ID: $container_id"
-        echo "Mounting the container..."
-        buildah mount --storage-driver vfs $container_id
-        echo "Running oscap-chroot scan"
-        oscap-chroot $(buildah --storage-driver vfs mount | awk '{print $2}') xccdf eval --profile $(inputs.params.xccdfProfile) --report $(workspaces.report.path)/report.html $(inputs.params.oscapProfilePath)
-        echo "Displaying contents of $(workspaces.report.path)/report.html"
-        echo "********** START OF report.html **********"
-        cat $(workspaces.report.path)/report.html
+      - >
+        set -eo pipefail &&
+        echo "Pulling image $(params.container-image-url)" &&
+        buildah from --tls-verify=false --storage-driver vfs "docker://$(params.container-image-url):$(params.container-imagetag)" &&
+        container_id=`buildah --storage-driver vfs containers -q` &&
+        echo "Container ID: $container_id" &&
+        echo "Mounting the container..." &&
+        mount_point=`buildah mount --storage-driver vfs $container_id | cut -d' ' -f2` &&
+        echo "Running oscap-chroot scan" &&
+        oscap-chroot "$mount_point" xccdf eval --profile "$(params.xccdfProfile)" --report "$(workspaces.report.path)/report.html" "$(params.oscapProfilePath)" &&
+        echo "Displaying contents of $(workspaces.report.path)/report.html" &&
+        echo "********** START OF report.html **********" &&
+        cat "$(workspaces.report.path)/report.html" &&
         echo "********** END OF report.html ************"
 {% endfor %}
