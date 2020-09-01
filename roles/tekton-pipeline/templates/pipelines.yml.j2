@@ -8,6 +8,8 @@
     resources:
     - name: app-git
       type: git
+    - name: report
+      type: git
     tasks:
     - name: build-app
       taskRef:
@@ -126,6 +128,19 @@
       taskRef:
         kind: Task
         name: deploy-app-from-imagestream
+      runAfter:
+      - build-app-image
+    - name: oscap-report-publish
+      taskRef:
+        kind: Task
+        name: oscap-report-publish
+      resources:
+        inputs:
+        - name: report
+          resource: report
+      workspaces:
+      - name: report
+        workspace: oscap-report
       runAfter:
       - oscap-image-scan
     workspaces:

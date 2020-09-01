@@ -16,6 +16,20 @@
 - apiVersion: tekton.dev/v1alpha1
   kind: PipelineResource
   metadata:
+    name: report
+    namespace: {{ username }}-cicd
+  spec:
+    params:
+    - name: url
+      value: >-
+        https://gitea-server-devsecops.{{ cluster_router }}/{{ username }}/openshift-tasks-report.git
+    - name: revision
+      value: master
+    type: git
+
+- apiVersion: tekton.dev/v1alpha1
+  kind: PipelineResource
+  metadata:
     name: image
     namespace: {{ username }}-cicd
   spec:

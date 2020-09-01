@@ -1,0 +1,22 @@
+{% for username in workshop_users|json_query("[].username") %}
+- apiVersion: tekton.dev/v1beta1
+  kind: Task
+  metadata:
+    name: oscap-report-publish
+    namespace: {{ username }}-cicd
+  spec:
+    resources:
+      inputs:
+      - name: report
+        type: git
+    steps:
+    - name: do-nothing
+      image: 'gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:latest'
+      script: |
+        #!/bin/sh
+        set -e -o pipefail
+        ls -halF
+      workingDir: $(inputs.resources.source.path)
+    workspaces:
+    - name: report
+{% endfor %}
