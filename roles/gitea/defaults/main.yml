@@ -7,5 +7,4 @@ tasks_github_project: "{{ github_project }}"
 
 repos_to_load:
   - openshift-tasks
-
-
+  - openshift-tasks-report
