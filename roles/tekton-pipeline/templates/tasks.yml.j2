@@ -67,7 +67,7 @@
         git rev-parse --verify --short HEAD | tee
         $(inputs.resources.source.path)/$(params.app_name)-gitsha.txt
       workingDir: $(inputs.resources.source.path)
-    - name: create-build-config
+    - name: create-build-config-and-configmap
       image: 'quay.io/openshift/origin-cli:latest'
       script: >
         #!/bin/sh
@@ -86,6 +86,11 @@
 
         oc new-build -o yaml --name=$(params.app_name) --image-stream=jboss-eap72-openshift:1.1  --binary=true -n
         $(params.project) | oc apply -n $(params.project) -f -
+
+        # This saves the GITSHA to a configmap for use in later tasks
+
+        oc create configmap tekton-current-revision -n $(params.project)
+        --from-literal=revision=$GITSHA
     - name: build-app-image
       image: 'quay.io/openshift/origin-cli:latest'
       script: >
@@ -179,6 +184,7 @@
       description: The name of the project to which to copy the ImageStream
       type: string
     - name: app_revision
+      default: ''
       description: The tag of the container image to copy from src to dst
       type: string
     steps:
@@ -197,27 +203,33 @@
         fi
 
       image: 'quay.io/openshift/origin-cli:latest'
-    - name: retag-imagestream-to-dst-project
+    - name: deploy-from-imagestream-to-dst-project
       script: >
         #!/bin/sh
 
-        echo "Tagging image stream to
-        $(params.dst_project)/$(params.app_name):$(params.app_revision)"
+        if [ "$(params.app_revision)" = "" ]; then
+
+          GITSHA=`oc get configmap tekton-current-revision -n $(params.src_project)
+          -o jsonpath='{ .data.revision }'`
+
+        else
+
+          GITSHA="$(params.app_revision)"
+
+        fi
+
+        echo "Tagging image stream from
+        $(params.src_project)/$(params.app_name):$GITSHA
+        to
+        $(params.dst_project)/$(params.app_name):$GITSHA"
 
         oc tag
-        $(params.src_project)/$(params.app_name):$(params.app_revision)
-        $(params.dst_project)/$(params.app_name):$(params.app_revision)
+        $(params.src_project)/$(params.app_name):$GITSHA
+        $(params.dst_project)/$(params.app_name):$GITSHA
 
-      image: 'quay.io/openshift/origin-cli:latest'
-    - name: deploy-new-version-to-dst
-      script: >
-        #!/bin/sh
+        echo "Deploying new version into $(params.dst_project) project "
 
-        set -e -o pipefail
-
-        echo "Deploying new version into $(params.dst_project)  project "
-
-        oc new-app --image-stream=$(params.app_name):$(params.app_revision) -n $(params.dst_project)
+        oc new-app --image-stream=$(params.app_name):$GITSHA -n $(params.dst_project)
         --as-deployment-config=true -o yaml  | oc apply -n $(params.dst_project)  -f -
 
         oc expose svc $(params.app_name) -n  $(params.dst_project)
