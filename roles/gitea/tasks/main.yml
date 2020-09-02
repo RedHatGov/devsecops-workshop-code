@@ -42,7 +42,7 @@
           expose:
             kind: Route
             ssl: true
-            uri: gitea-devsecops.apps.cluster-24c2.24c2.example.opentlc.com
+            uri: gitea-{{ gitea_project_name }}.apps.{{ cluster_name }}.{{ openshift_base_domain }}
           volumeSize: 4Gi
         persistent: true
         postgresql:
