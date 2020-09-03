@@ -11,7 +11,7 @@
       {
         "clone_addr": "https://github.com/{{ tasks_github_project }}/{{ repo }}.git",
         "uid": {{ user.uid|int }},
-        "repo_name": "openshift-tasks"
+        "repo_name": "{{ repo }}"
       }
   register: gitea_repo_migration_task
   failed_when: gitea_repo_migration_task.status != 201
