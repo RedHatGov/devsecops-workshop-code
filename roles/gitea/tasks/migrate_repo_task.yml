@@ -1,5 +1,5 @@
 ---
-- name: Make an API request for each user to migrate this project
+- name: Make an API request for each user to migrate {{ repo }}
   uri:
     url: https://gitea-server-{{ gitea_project_name }}.{{ cluster_router }}/api/v1/repos/migrate
     validate_certs: no
