@@ -11,6 +11,8 @@ repos_to_load:
 rhsso_realm_name: openshift
 rhsso_project_name: rhsso
 rhsso_app_label: rhsso
+rhsso_gitea_client_id: gitea
+subdomain: '{{ full_cluster_name }}'
 
 
 

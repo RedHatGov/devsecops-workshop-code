@@ -11,9 +11,9 @@
       matchLabels:
         app: {{ rhsso_app_label }}
     client:
-      clientId: gitea
-      secret: gitea
-      name: gitea
+      clientId: {{ rhsso_gitea_client_id }} 
+      secret: {{ rhsso_gitea_secret }} 
+      name: {{ rhsso_gitea_client_id }}
       enabled: true
       clientAuthenticatorType: client-secret
       publicClient: false

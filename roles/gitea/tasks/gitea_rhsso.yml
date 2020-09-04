@@ -1,0 +1,66 @@
+---
+
+- name: Generate a Gitea secret for RHSSO
+  set_fact:
+    rhsso_gitea_secret: "{{ lookup('password', '/dev/null length=15 chars=ascii_letters') }}"
+
+- name: Create RHSSO Client definition for Gitea
+  k8s:
+    kubeconfig: '{{ kubeconfig }}'
+    definition: '{{ lookup("template", "../templates/rhsso-gitea-client.yml.j2")|from_yaml }}'
+
+- name: Configure RHSSO as an OAuth2 provider for Gitea
+  shell: |
+    export KUBECONFIG='{{ kubeconfig }}'
+    oc='{{ oc_cli }}'
+    admin_user='{{ workshop_admin.username }}'
+    admin_password='{{ workshop_admin.password }}'
+    if [ $($oc whoami) != "$admin_user" ]; then
+        $oc login --insecure-skip-tls-verify=true -u "$admin_user" -p "$admin_password" || exit 1
+    fi
+
+    pod=$($oc get pods -n {{ gitea_project_name }} -l app=gitea-server -o jsonpath='{.items[0].metadata.name}')
+    echo "running: 'gitea admin add-oauth' CLI in container"
+    
+    output=$($oc exec $pod -n {{ gitea_project_name }} -- /home/gitea/gitea --config=/home/gitea/conf/app.ini admin auth add-oauth --name=rhsso --provider openidConnect --key {{ rhsso_gitea_client_id }} --secret {{ rhsso_gitea_client_id }} --auto-discover-url  https://keycloak-{{ rhsso_project_name }}.apps.{{ subdomain }}/auth/realms/{{ rhsso_realm_name }}/.well-known/openid-configuration 2>&1)
+
+    if echo "$output" | grep -qF 'login source already exists'; then
+      echo ok
+    elif echo "$output" | grep -qF 'Failed to run app'; then
+        echo "failed"
+        echo "output: $output"
+    elif echo "$output" | grep -qE 'INSERT INTO "login_source"'; then   
+       echo "changed"
+    else
+        echo "failed"
+        echo "output: $output"
+    fi
+    echo "$output" >&2
+  register: gitea_rhsso_oauth
+  changed_when: '"changed" in gitea_rhsso_oauth.stdout_lines'
+  failed_when: '"failed" in gitea_rhsso_oauth.stdout_lines'
+
+- name : Restart gitea if the RHSSO changes were applied
+  block:    
+  - name: Kill gitea pod for auth changes to take into effect
+    k8s:
+      kubeconfig: '{{ kubeconfig }}'
+      api_version: v1
+      kind: Pod
+      namespace: '{{ gitea_project_name }}'
+      name: "{{ (gitea_pod.resources|first).metadata.name }}"
+      state: absent
+
+  - name: Wait **again** for Gitea to finish being created with RHSSO settings
+    k8s_info:
+      kubeconfig: '{{ kubeconfig }}'
+      api_version: v1
+      kind: Pod
+      namespace: '{{ gitea_project_name }}'
+      label_selectors:
+        - app=gitea-server
+    register: gitea_pod
+    until: gitea_pod.resources|length > 0 and (gitea_pod.resources|first).status.phase == "Running"
+    retries: 10
+    delay: 30
+  when: gitea_rhsso_oauth.changed
