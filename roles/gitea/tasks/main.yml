@@ -51,3 +51,19 @@
   until: not gitea_deployment.failed
   retries: 5
   delay: 10
+
+- name: Wait for Gitea to finish being created
+  k8s_info:
+    kubeconfig: '{{ kubeconfig }}'
+    api_version: v1
+    kind: Pod
+    namespace: '{{ gitea_project_name }}'
+    label_selectors:
+      - app=gitea-server
+  register: gitea_pod
+  until: gitea_pod.resources|length > 0 and (gitea_pod.resources|first).status.phase == "Running"
+  retries: 10
+  delay: 30
+
+- name: Configure Gitea and RHSSO to work together
+  include: gitea_rhsso.yml
