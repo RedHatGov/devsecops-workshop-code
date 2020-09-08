@@ -11,13 +11,7 @@
 
 - name: Configure RHSSO as an OAuth2 provider for Gitea
   shell: |
-    export KUBECONFIG='{{ kubeconfig }}'
     oc='{{ oc_cli }}'
-    admin_user='{{ workshop_admin.username }}'
-    admin_password='{{ workshop_admin.password }}'
-    if [ $($oc whoami) != "$admin_user" ]; then
-        $oc login --insecure-skip-tls-verify=true -u "$admin_user" -p "$admin_password" || exit 1
-    fi
 
     pod=$($oc get pods -n {{ gitea_project_name }} -l app=gitea-server -o jsonpath='{.items[0].metadata.name}')
     echo "running: 'gitea admin add-oauth' CLI in container"
