@@ -20,6 +20,10 @@
       email: {{ item.email }}
       enabled: True
       emailVerified: False
+{% if item.realmRoles is defined %}
       realmRoles: {{ item.realmRoles }}
+{% endif %}
+{% if item.clientRoles is defined %}
       clientRoles: {{ item.clientRoles }}
+{% endif %}
 

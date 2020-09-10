@@ -45,3 +45,16 @@
     kubeconfig: '{{ kubeconfig }}'
     namespace: '{{ jenkins_project_name }}'
     definition: '{{ lookup("template", "jenkins.yml.j2")|from_yaml }}'
+
+- name: Delete RoleBinding for user accounts if they exist
+  k8s:
+    kubeconfig: '{{ kubeconfig }}'
+    namespace: '{{ jenkins_project_name }}'
+    definition: '{{ lookup("template", "jenkins_user_role_binding.yml.j2")|from_yaml }}'
+    state: absent
+
+- name: Add RoleBinding for user accounts
+  k8s:
+    kubeconfig: '{{ kubeconfig }}'
+    namespace: '{{ jenkins_project_name }}'
+    definition: '{{ lookup("template", "jenkins_user_role_binding.yml.j2")|from_yaml }}'

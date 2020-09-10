@@ -67,16 +67,62 @@ oc_cli: '{{ tmp_dir }}/oc'
 #   understand them, but they aren't necessary to minimally deploy.
 ################################################################################
 
+
+generated_password: "{{ lookup('password', '../tmp/rhssopasswd.txt length=15 chars=ascii_letters') }}"
+
+################################################################################
+#
+# User attributes
+# - username: 
+#   firstName: 
+#   lastName: 
+#   password: 
+#   email: 
+#   admin: # boolean, yes or true if this user is a cluster admin
+#   jenkinsRole: # Set to 'admin', 'edit', 'view', or leave undefined if no jenkins access is needed
+#   realmRoles: # list of Realm defined roles assigned to user
+#   clientRoles: # RH-SSO Clients may have custom roles, for each client provide a list of client specific roles to assign
+#     rh-sso-client-name:
+#      - "clientrole"
+#
+################################################################################
+
 # A list of manually created users:
 manual_users:
   - username: openshift-admin
+    firstName: OpenShift
+    lastName: Administrator
     password: RedHatAdmin1
+    email: realmadmin@example.com
     admin: yes
+    realmRoles:
+      - "offline_access"
+    clientRoles:
+      account:
+        - "manage-account"
+      realm-management:
+        - "manage-users"
+  - username: realmadmin
+    firstName: Realm
+    lastName: Administrator
+    password: "{{ generated_password }}"
+    email: realmadmin@example.com
+    realmRoles:
+      - "offline_access"
+    clientRoles:
+      account:
+        - "manage-account"
+      realm-management:
+        - "manage-users"
 
 # A specially designated user for administering workshop content
 workshop_admin:
   username: workshop-admin
+  firstName: workshop-admin
+  lastName: Workshop Admin
   password: RedHatAdmin1
+  email: workshop@example.com
+  jenkinsRole: admin
   admin: yes
 
 # The number of users created, as a string
@@ -86,13 +132,23 @@ number_of_users: "30"
 sequence_users: |
   {%- for username in lookup("sequence", "1-" + number_of_users + ":user%0i", wantlist=True) %}
     - username: {{ username }}
-      password: openshift
+      firstName: {{ username }}
+      lastName: Workshop user
+      password: "{{ generated_password }}"
+      email: {{ username }}@example.com
+      jenkinsRole: edit
   {% endfor -%}
 
 # The users to create in OpenShift
 openshift_users: '{{ manual_users + [workshop_admin] + sequence_users|from_yaml }}'
 # The users to create workshop projects/integrations for
 workshop_users: '{{ [workshop_admin] + sequence_users|from_yaml }}'
+
+# Set common variables for RH-SSO setup and client integration
+rhsso_users: '{{ openshift_users }}'
+rhsso_realm_name: openshift
+rhsso_project_name: rhsso
+rhsso_app_label: rhsso
 
 # The type of worker to provision (including MachineSet adjustments)
 cluster_worker_machine_type: m4.2xlarge
