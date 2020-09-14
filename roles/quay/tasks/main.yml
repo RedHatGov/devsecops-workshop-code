@@ -50,16 +50,6 @@
   retries: 10
   delay: 30
 
-- name: Add users to Quay instance
-  shell: >-
-    devsecops-api quay add-user https://{{ quay_route }}
-    --login-username quay --login-password '{{ quay_password }}'
-    --usernames '{{ workshop_users|json_query("[].username")|join(",") }}'
-    --passwords '{{ workshop_users|json_query("[].password")|join(",") }}'
-  register: quay_users
-  # https://github.com/ansible/ansible/issues/27299
-  # to_json|from_json| is a terrible hack but here we are
-  changed_when: quay_users.stdout_lines|to_json|from_json|json_query("[?ends_with(@, ` added`)]")|length > 0
 
 - name: Subscribe to container-security operator
   k8s:
@@ -77,8 +67,8 @@
         source: redhat-operators
         sourceNamespace: openshift-marketplace
 
-# Disabled for now until Quay API becomes more useful for automating Bridge
-#   setup/prerequisites.
-#
-# - name: Install and configure Quay Bridge operator
-#   include_tasks: quay_bridge.yml
+
+- name: Configure Quay and RHSSO to work together
+  include: quay_rhsso.yml
+
+

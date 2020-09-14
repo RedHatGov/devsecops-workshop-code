@@ -17,3 +17,6 @@
 - include_role:
     name: legacy-jenkins
   when: deploy_legacy_jenkins
+- include_role:
+    name: quay
+  when: deploy_quay
