@@ -40,12 +40,13 @@
       spec:
         persistent: true
         nexus:
-          allowAnonymousAccess: false
+          allowAnonymousAccess: true
           oauth:
             enabled: true
             adminUsers:
               - openshift-admin
               - kubeadmin
+            bypassPaths: '{{ nexus_oauth_bypass_paths }}'
           expose:
             ssl: true
             kind: Route
