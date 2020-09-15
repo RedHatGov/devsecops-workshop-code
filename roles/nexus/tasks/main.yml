@@ -40,10 +40,15 @@
       spec:
         persistent: true
         nexus:
+          allowAnonymousAccess: false
+          oauth:
+            enabled: true
+            adminUsers:
+              - openshift-admin
+              - kubeadmin
           expose:
             ssl: true
             kind: Route
-            oauth: true
           image:
             src: registry.connect.redhat.com/sonatype/nexus-repository-manager
             tag: latest
