@@ -59,7 +59,7 @@
     kind: Pod
     namespace: '{{ gitea_project_name }}'
     label_selectors:
-      - app=gitea-server
+      - "{{ gitea_pod_label }}"
   register: gitea_pod
   until: gitea_pod.resources|length > 0 and (gitea_pod.resources|first).status.phase == "Running"
   retries: 10
