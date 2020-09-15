@@ -46,7 +46,7 @@
             adminUsers:
               - openshift-admin
               - kubeadmin
-            bypassPaths: '{{ nexus_oauth_bypass_paths }}'
+            bypassAuthFor: '{{ nexus_oauth_bypass_paths }}'
           expose:
             ssl: true
             kind: Route
