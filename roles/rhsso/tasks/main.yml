@@ -4,3 +4,4 @@
 - include: rhsso-operator.yml
 - include: rhsso.yml
 - include: rhsso-ocp-idp.yml
+- include: rhsso-users.yml

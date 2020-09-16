@@ -1,5 +1,13 @@
 ---
 - hosts: localhost
+  vars_prompt:
+    - name: rhedsord_registry_username
+      prompt: "What is the username for the disconnected registry?"
+      private: no
+    
+    - name: rhedsord_registry_password
+      prompt: "What is the password for the disconnected registry"
+
   pre_tasks:
     - name: Look for default defined common variables
       include_vars: ../vars/common.yml

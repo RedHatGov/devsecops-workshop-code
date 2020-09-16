@@ -21,31 +21,6 @@
       - op: add
         path: /spec/identityProviders/[?name='{{ item.name }}']
         value: '{{ item }}'
-  loop:
-    - name: rhsso-idp
-      challenge: true
-      login: true
-      mappingMethod: claim
-      type: OpenID
-      openID:
-        clientID: "openshift"
-        clientSecret:
-          name: keycloak-client-secret-openshift
-        extraScopes:
-        - email
-        - profile
-        extraAuthorizeParameters:
-          include_granted_scopes: "true"
-        claims:
-          preferredUsername:
-          - preferred_username
-          - email
-          name:
-          - nickname
-          - given_name
-          - name
-          email:
-          - custom_email_claim
-          - email
-        issuer: https://keycloak-{{ rhsso_project_name }}.apps.{{ subdomain }}/auth/realms/{{ rhsso_realm_name }}
+  loop: '{{ lookup("template", "rhsso-ocp-idp.yml.j2")|from_yaml }}'
+
 
