@@ -55,4 +55,4 @@ deploy_automated_build: no  # You shouldn't
 # deploy_workshop: no
 
 # Change quay config definition to allow mirroring of image repositories
-enable_quay_repo_mirroring: yes
+# enable_quay_repo_mirroring: yes
