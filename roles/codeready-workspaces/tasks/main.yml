@@ -27,8 +27,12 @@
         namespace: '{{ crw_project_name }}'
       spec:
         auth:
-          externalIdentityProvider: false
-          openShiftoAuth: true
+          identityProviderURL: 'https://keycloak-{{ rhsso_project_name }}.apps.{{ full_cluster_name }}'
+          identityProviderRealm: '{{ rhsso_realm_name }}'
+          identityProviderClientId: codeready-public
+          identityProviderAdminUserName: '{{ crw_admin_user.username }}'
+          externalIdentityProvider: true
+          openShiftoAuth: false
         database:
           externalDb: false
         k8s: {}
@@ -47,89 +51,12 @@
   retries: 5
   delay: 10
 
-- name: Wait for Codeready route to be created by the Operator
-  k8s_info:
+- name: Create RHSSO Client definition for CRW
+  k8s:
     kubeconfig: '{{ kubeconfig }}'
-    api_version: route.openshift.io/v1
-    kind: Route
-    namespace: '{{ crw_project_name }}'
-    name: codeready
-  register: codeready_route
-  until: codeready_route.resources|length > 0
-  retries: 10
-  delay: 30
+    definition: '{{ lookup("template", "../templates/rhsso-crw-client.yml.j2")|from_yaml }}'
 
-- set_fact:
-    codeready_route: '{{ codeready_route|json_query("resources[0].spec.host") }}'
-
-- name: Wait for CodeReady Workspaces to respond to requests
-  uri:
-    url: 'https://{{ codeready_route }}/'
-    return_content: yes
-    validate_certs: no
-  register: codeready_endpoint
-  until: codeready_endpoint.status == 200
-  retries: 20
-  delay: 30
-
-- name: Wait for KeyCloak to respond to requests
-  uri:
-    url: '{{ keycloak_url }}'
-    return_content: yes
-    validate_certs: no
-  register: keycloak_endpoint
-  until: keycloak_endpoint.status == 200
-  retries: 10
-  delay: 30
-
-- name: Get Che Identity Secret
-  k8s_info:
+- name: Create CRW Admin User
+  k8s:
     kubeconfig: '{{ kubeconfig }}'
-    api_version: v1
-    kind: Secret
-    name: che-identity-secret
-    namespace: "{{ crw_project_name }}"
-  register: che_identity_secret
-
-- set_fact:
-    sso_admin_password: "{{ che_identity_secret | json_query('resources[0].data.password') | b64decode }}"
-    sso_admin_user: "{{ che_identity_secret | json_query('resources[0].data.user') | b64decode }}"
-
-- name: Get CodeReady SSO admin token
-  uri:
-    url: '{{ keycloak_url }}/auth/realms/master/protocol/openid-connect/token'
-    validate_certs: false
-    method: POST
-    body:
-      username: "{{ sso_admin_user }}"
-      password: "{{ sso_admin_password }}"
-      grant_type: "password"
-      client_id: "admin-cli"
-    body_format: form-urlencoded
-    status_code: 200,201,204
-  register: codeready_sso_admin_token
-
-- name: Increase CodeReady access token lifespans
-  uri:
-    url: '{{ keycloak_url }}/auth/admin/realms/codeready'
-    validate_certs: false
-    method: PUT
-    headers:
-      Content-Type: application/json
-      Authorization: "Bearer {{ codeready_sso_admin_token.json.access_token }}"
-    body:
-      accessTokenLifespan: 28800
-      accessTokenLifespanForImplicitFlow: 28800
-      actionTokenGeneratedByUserLifespan: 28800
-      ssoSessionIdleTimeout: 28800
-      ssoSessionMaxLifespan: 28800
-    body_format: json
-    status_code: 204
-
-- name: Hotload user workspaces
-  include_tasks: hotload_user.yml
-  when: hotload_crw_users
-  loop: '{{ workshop_users }}'
-  loop_control:
-    loop_var: user
-    label: '{{ user.username }}'
+    definition: '{{ lookup("template", "../templates/rhsso-user.yml.j2")|from_yaml }}'

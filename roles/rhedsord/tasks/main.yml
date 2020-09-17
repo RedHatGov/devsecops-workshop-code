@@ -21,5 +21,10 @@
     name: quay
   when: deploy_quay
 - include_role:
+<<<<<<< HEAD
     name: mattermost
   when: deploy_mattermost_operator
+=======
+    name: codeready-workspaces
+  when: deploy_crw
+>>>>>>> Modify CRW role to use existing SSO instance
