@@ -27,4 +27,7 @@
 =======
     name: codeready-workspaces
   when: deploy_crw
+<<<<<<< HEAD
 >>>>>>> Modify CRW role to use existing SSO instance
+=======
+>>>>>>> Add newline to EOF in rhedsord role'
