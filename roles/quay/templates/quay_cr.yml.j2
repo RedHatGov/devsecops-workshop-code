@@ -24,7 +24,5 @@ spec:
       volumeSize: 10Gi
     registryStorage:
       persistentVolumeSize: 10Gi
-{% if not (deploy_ocs|default(true)) %}
       persistentVolumeAccessModes:
         - ReadWriteOnce
-{% endif %}
