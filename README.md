@@ -1,8 +1,6 @@
-# OpenShift DevSecOps Workshop
+# OpenShift 4 DevSecOps Workshop
 
 ---
-
-## **Note**: This is a temporary README to support testing and demonstration of the status of the repository, it is not the final intended README
 
 ## Design Goals
 
@@ -16,25 +14,15 @@ Several design goals were set in place before this started, and they have evolve
 - There should be zero interaction required from the time you start to deploy the cluster to the time that the workshop is available for use. Anywhere that automation can make a decision about setting something up, it should have a variable available to change its behavior but assume a sane default.
 - Readability is fundamentally important and any time that something is deemed to be too difficult to understand (large in-line Jinja or JMESPath, for example), it should be separated to be easier to understand.
 
-## Supported Operating Systems
+## Operation
 
-Right now, `run.sh` is the primary mechanism for executing the playbooks. It provides the appropriate context and control for chaining playbooks together locally, as well as ensuring that prerequisites for the roles and playbooks are implemented on your system. You can use `run.sh` on unsupported platforms by ensuring the dependencies are met before running it, or you can use it on a supported platform to have it do the work for you.
+This should work even on a Mac! You need a container runtime (either Docker or Podman) installed on your machine and... that's pretty much it.
 
-`run.sh` was developed on Fedora 30 and 31. All modern testing of it has been done on Fedora 32. The most important part of satisfying dependencies automatically is that you have `dnf` available and a Fedora-like package naming convention. This means that it should operate as expected on RHEL 8, but this has not been tested for validity.
-
-The requirements for running the playbooks and roles have been mostly consolidated into `runreqs.json` and the hashmap should be relatively self-explanitory. If the binaries listed are in your `$PATH`, `run.sh` will not attempt to install them. If they are not, `run.sh` will attempt to install them using `dnf` with `sudo`. This enables running on arbitrary alternative \*NIX platforms, if the binaries are in your path. The absolute most basic requirements are `python` and `jq`, and they are not included in `runreqs.json` as they will not be changing based on the workshop content, but must exist prior to other dependency setup. `run.sh` will attempt to install them both, as well as `pip` in user mode, if they are not available in `$PATH`.
-
-To run the playbooks yourself, using `ansible-playbook` and without `run.sh`, `jq` is not required but the other binaries in the `dnf` key as well as the Python libraries in the `pip` key of `runreqs.json` are all required.
-
-## Alternative, container-based usage
-
-This should work even on a Mac!
-
-`run-container.sh` has been developed to use the Dockerfile present to run the playbooks and roles inside a RHEL 8 UBI container image. This means you can use run-container.sh to package a new container image on the fly with your changes to the repository, satisfying dependencies, and then map tmp and vars in to the container. In order to enable multiple clusters being run with multiple containers, `run-container.sh` requires some alternative variables to be set.
+`run-container.sh` has been developed to use the Dockerfile present to run the playbooks and roles inside a RHEL 8 UBI container image. This means you can use run-container.sh to package a new container image on the fly with your changes to the repository, satisfying dependencies, and then map tmp and vars in to the container. In order to enable multiple clusters being run with multiple containers, `run-container.sh` requires a cluster name, and your variables should be structured into folders.
 
 ```shell
 usage: run-container.sh [-h|--help] | [-v|--verbose] [(-e |--extra=)VARS] \
-  (-c |--cluster=)CLUSTER [-k |--kubeconfig=)FILE \
+  (-c |--cluster=)CLUSTER [-k |--kubeconfig=)FILE] [-f|--force] \
   [[path/to/]PLAY[.yml]] [PLAY[.yml]]...
 ```
 
@@ -48,7 +36,7 @@ cp vars/common.example.yml vars/rhpds/common.yml
 cp vars/devsecops.example.yml vars/rhpds/devsecops.yml
 ```
 
-Then edit `vars/rhpds/common.yml` so that cluster_name and openshift_base_domain match the email you got from RHPDS. You will additionally have to set `oc_cli` to the commented-out value of `/usr/local/bin/oc` for the container workflow, if you are not provisioning. **You should not change kubeconfig in common.yml for the container workflow.**
+Then edit `vars/rhpds/common.yml` so that cluster_name and openshift_base_domain match the email you got from RHPDS. **You should not change kubeconfig in common.yml to the location of your own kubeconfig.**
 
 You can edit the rest of `common.yml` and `devsecops.yml` to suit your needs, in their normally documented fashion, for playbook execution inside the container.
 
@@ -72,93 +60,18 @@ Do note that the containers run, in a `podman` environment, as your user - witho
 Additionally, if you would like to work on just one cluster using the container workflow, you can do any portion of the following the following to skip having to specify these variables or be prompted for them:
 
 ```shell
-export DEVSECOPS_CLUSTER=rhpds                                                   # The cluster name for vars directory and container image name
+export DEVSECOPS_CLUSTER=personal                                                # The cluster name for vars directory and container image name
 export AWS_ACCESS_KEY_ID=<YOUR ACTUAL AWS_ACCESS_KEY_ID>                         # Your actual AWS_ACCESS_KEY_ID, which you would otherwise be prompted for if provisioning/destroying a cluster
 export AWS_SECRET_ACCESS_KEY=<YOUR ACTUAL AWS_SECRET_ACCESS_KEY>                 # Your actual AWS_SECRET_ACCESS_KEY, which you would otherwise be prompted for if provisioning/destroying a cluster
 ./run-container.sh provision devsecops
-#                    ^---------^----these are just playbook names, like you would normally pass to `run.sh`
+#                    ^---------^----these are just playbook names, present in playbooks/*.yml
 ```
-
-## Basic operation
-
-### Deployment of an OpenShift cluster
-
-1. For easiest operation, you should create a file at the project root named `.aws` with the following content:
-
-   ```shell
-   export AWS_ACCESS_KEY_ID=<your actual access key ID>
-   export AWS_SECRET_ACCESS_KEY=<your actual access key secret>
-   ```
-
-   It is in .gitignore, so you won't be committing secrets if you make changes.
-1. Open a terminal and change into the project directory. Source `prep.sh`:
-
-   ```shell
-   cd openshift-devsecops # or wherever you put the project root
-   . prep.sh
-   ```
-
-1. Copy the vars examples and edit them to match your desired environment
-
-   ```shell
-   cp vars/common.example.yml vars/common.yml
-   vi vars/common.yml               # Change the appropriate variables
-   cp vars/provision.example.yml vars/provision.yml
-   vi vars/provision.yml            # Change the appropriate variables
-   ```
-
-1. Execute `run.sh` with the names of the playbooks you would like run, in order.
-
-   ```shell
-   ./run.sh provision
-   ```
-
-1. Wait a while. Currently, in my experience, it takes about 35-45 minutes to deploy a cluster.
-
-### Deployment of workshop on an existing cluster
-
-1. Open a terminal and change into the project directory. Copy the vars examples and edit them to match your desired environment.
-
-   ```shell
-   cd openshift-devsecops # or wherever you put the project root
-   cp vars/common.example.yml vars/common.yml
-   vi vars/common.yml               # Change the appropriate variables
-   cp vars/devsecops.example.yml vars/devsecops.yml
-   vi vars/devsecops.yml            # Change the appropriate variables
-   ```
-
-1. Execute `run.sh` with the names of the devsecops playbook
-
-   ```shell
-   ./run.sh devsecops
-   ```
-
-1. Wait a while. Currently, in my experience, it takes about 30 minutes to deploy everything by default.
-
-### Alternatively, deploy a cluster and the workshop content at once
-
-1. Do all of the above steps for both parts at once.
-
-   ```shell
-   cd openshift-devsecops # or wherever you put the project root
-   . prep.sh
-   cp vars/common.example.yml vars/common.yml
-   vi vars/common.yml               # Change the appropriate variables
-   cp vars/provision.example.yml vars/provision.yml
-   vi vars/provision.yml            # Change the appropriate variables
-   cp vars/devsecops.example.yml vars/devsecops.yml
-   vi vars/devsecops.yml            # Change the appropriate variables
-   ./run.sh provision devsecops
-   ```
-
-1. Wait a while. Currently, in my experience, it takes about an hour to deploy a cluster and everything by default.
 
 ### Access the workshop services if you deployed the cluster from this repo
 
-1. Access the cluster via cli or web console. If this repo deployed your cluster, the `oc` client is downloaded into `tmp`, in a directory named after the cluster, and `prep.sh` can put that into your path. The web console should be available at `https://console.apps.{{ cluster_name }}.{{ openshift_base_domain }}`. If you have recently deployed a cluster, you can update kubeconfig paths and $PATH for running binaries with the following:
+1. Access the cluster via cli or web console. If this repo deployed your cluster, the `oc` client is downloaded into `tmp`, in a directory named after the cluster, and `prep.sh` can put that into your path. The web console should be available at `https://console.apps.{{ cluster_name }}.{{ openshift_base_domain }}` (if you left the adjust_console variable alone). If you have recently deployed a cluster, you can update kubeconfig paths and $PATH for running binaries with the following:
 
    ```shell
-   cd openshift-devsecops # or wherever you put the project root
    . prep.sh
    ```
 
@@ -166,12 +79,9 @@ export AWS_SECRET_ACCESS_KEY=<YOUR ACTUAL AWS_SECRET_ACCESS_KEY>                
 1. If you deployed the cluster with this repo, when you are ready to tear the cluster down, run the following commands from the project root:
 
    ```shell
-   cd openshift-devsecops # or wherever you put the project root
    . prep.sh
-   ./run.sh destroy
+   ./run-container.sh -c CLUSTER destroy
    ```
-
-   If you are using multiple clusters or otherwise non-default vars files locations, you can specify a common.yml path (e.g. with `-e @vars/my_common.yml`) to destroy a specific cluster.
 
 ## Basic Structure
 
@@ -205,14 +115,14 @@ Future plans for this playbook:
 This playbook will deploy all of the services to be used in the workshop. First it adjusts the cluster to be ready to accept workshop content by doing the following:
 
 - Create htpasswd-backed users based on the vars provided
-- Delete the kubeadmin default user
+- Delete the kubeadmin default user, if present
 - Generate and apply LetsEncrypt certificates for both the API endpoint and the default certificate for the OpenShift Router (If you have AWS keys sourced or included in vars)
 - Enable Machine and Cluster Autoscalers to allow the cluster to remain as small as possible (two 2xlarge instances as workers by default) until a load requires more nodes to be provisioned.
 - Change the console route to `console.apps.{{ cluster_name }}.{{ openshift_base_domain }}` because `console-openshift-console.apps` was deemed to be _just a bit much_.
 
-As a rule, it uses Operators for the provisioning/management of all services. Where an appropriate Operator was available in the default catalog sources, those were used. Where one doesn't exist, they were sourced from Red Hat GPTE published content. Also as a rule, it tries to stand up only one of each service and provision users on each service. The roles have all been designed such that they attempt to deploy sane defaults in the absence of custom variables, but there should be enough configuration available through templated variables that the roles are valuable outside of the scope of this workshop.
+As a rule, it uses Operators for the provisioning/management of all services. Where an appropriate Operator was available in the default catalog sources, those were used. Where one doesn't exist, they were sourced from Red Hat GPTE published content - or forked from that content and maintained by us. Also as a rule, it tries to stand up only one of each service and provision users on each service. The roles have all been designed such that they attempt to deploy sane defaults in the absence of custom variables, but there should be enough configuration available through templated variables that the roles are valuable outside of the scope of this workshop.
 
-The services provided are currently in rapid flux and you should simply look through the listing to see what's applied. For roles to be implemented or changed in the future, please refer to GitHub Issues as these are the tracking mechanism I'm using to keep myself on track.
+The services provided are currently in rapid flux and you should simply look through the listing to see what's applied. For roles to be implemented or changed in the future, please refer to GitHub Issues as these are the tracking mechanism we're using.
 
 #### playbooks/destroy.yml
 
@@ -222,44 +132,18 @@ This playbook will, provided a common.yml, identify if openshift-install was run
 
 ---
 
-There are example files that may be copied and changed for the variable files. Where deemed necessary, the variables are appropriately commented to explain where you should derive their values from, and what they will do for you.
-If you do not have them named exactly as they are shown, as long as you include a vars_file that sets the <vars_type>_included (eg common_included) using `-e` on the `run.sh` or `ansible-playbook` command line. This means you can name the files differently, and deploy multiple clusters at once. A hypothetical multi-cluster deployment workflow could be like this:
-
-   ```shell
-   cd openshift-devsecops # or wherever you put the project root
-   . prep.sh
-
-   # Deploy cluster 1
-   cp vars/common.example.yml vars/common_cluster1.yml
-   vi vars/common_cluster1.yml               # Change the appropriate variables
-   cp vars/provision.example.yml vars/provision_cluster1.yml
-   vi vars/provision_cluster1.yml            # Change the appropriate variables
-   cp vars/devsecops.example.yml vars/devsecops_cluster1.yml
-   vi vars/devsecops_cluster1.yml            # Change the appropriate variables
-   ./run.sh provision devsecops -e @vars/common_cluster1.yml -e @vars/provision_cluster1.yml -e @vars/devsecops_cluster1.yml
-
-   # Deploy cluster 2
-   cp vars/common.example.yml vars/common_cluster2.yml
-   vi vars/common_cluster2.yml               # Change the appropriate variables
-   cp vars/provision.example.yml vars/provision_cluster2.yml
-   vi vars/provision_cluster2.yml            # Change the appropriate variables
-   cp vars/devsecops.example.yml vars/devsecops_cluster2.yml
-   vi vars/devsecops_cluster2.yml            # Change the appropriate variables
-   ./run.sh provision devsecops -e @vars/common_cluster2.yml -e @vars/provision_cluster2.yml -e @vars/devsecops_cluster2.yml
-   ```
-
-#### vars/common.yml
+#### vars/CLUSTER/common.yml
 
 These variables include things that are important for both an RHPDS-deployed cluster and a cluster deployed from this project. They either define where the cluster is for connection, or they define how to deploy and later connect to the cluster. For clusters created with this project, it also indicates how to destroy the cluster.
 
-#### vars/provision.yml
+#### vars/CLUSTER/provision.yml
 
 The primary function of these variables is to provide information necessary to the `provision.yml` playbook for deploymen of the cluster. Future plans for this file align with the future plans for the playbook, intended to enable more infrastrucure platforms.
 
-#### vars/devsecops.yml
+#### vars/CLUSTER/devsecops.yml
 
 This mostly contains switches to enable or disable workshop services and infrastructure. It's also used right now to control from which GitHub project the various GPTE-built operators are sourced.
 
 ## Contributing
 
-I welcome pull requests and issues. I want this to become a valuable tool for Red Hatters at all levels to explore or use for their work, and to be a valuable resource for our partners. If there's something that you think I should do that I'm not, or something that's not working the way you think it was intended, please either let me know or fix it, if you're able. I would love to have help, and as long as we're communicating well via GitHub Issues about the direction that something should go, I won't turn away that help. Please, follow the overall design goals if making a pull request.
+We welcome pull requests and issues. Please, follow the overall design goals if making a pull request.
