@@ -2,5 +2,10 @@
 crw_project_name: devsecops
 crw_project_display: DevSecOps Common Resources
 
-hotload_crw_users: yes
-keycloak_url: "https://keycloak-{{ crw_project_name }}.apps.{{ cluster_name }}.{{ openshift_base_domain }}"
+rhsso_project_name: rhsso
+rhsso_realm_name: openshift
+rhsso_app_name: rhsso
+
+crw_admin_user:
+  username: codeready-admin
+  password: demo123

@@ -20,3 +20,6 @@
 - include_role:
     name: quay
   when: deploy_quay
+- include_role:
+    name: codeready-workspaces
+  when: deploy_crw
