@@ -40,6 +40,8 @@
           cheFlavor: codeready
           selfSignedCert: false
           tlsSupport: true
+          pluginRegistryImage: registry.redhat.io/codeready-workspaces/pluginregistry-rhel8:2.3
+          devfileRegistryImage: registry.redhat.io/codeready-workspaces/devfileregistry-rhel8:2.3
           customCheProperties:
             CHE_LIMITS_WORKSPACE_IDLE_TIMEOUT: "0"
         storage:
