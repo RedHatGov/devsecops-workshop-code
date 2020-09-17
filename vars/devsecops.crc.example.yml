@@ -30,7 +30,7 @@ projects:
 
 
 # The project from which custom Operators and other tooling will be pulled
-github_project: jharmison-redhat
+github_project: RedHatGov
 # NOTE: If the operators themselves still point to another image on Quay, the
 #   operator coming from this repo won't affect the images themselves.
 
