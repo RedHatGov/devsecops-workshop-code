@@ -37,16 +37,6 @@
       kind: Sonarqube
       metadata:
         name: sonarqube
-      spec:
-        persistent: true
-        postgresql:
-          volumeSize: 4Gi
-        sonarqube:
-          expose:
-            kind: Route
-            ssl: true
-            uri: sonarqube-{{ sonarqube_project_name }}.apps.{{ cluster_name }}.{{ openshift_base_domain }}
-          volumeSize: 4Gi
   register: sq_deployment
   until: not sq_deployment.failed
   retries: 5
