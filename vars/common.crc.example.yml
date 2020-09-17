@@ -31,10 +31,8 @@ common_included: yes
 # Fire up your CRC instance:
 #     crc start
 # And when it's done, to load the infrastructure using your local Ansible
-#   installation, you can run:
-#     ./run.sh -e @vars/crc/common.yml -e @vars/crc/devsecops.yml devsecops
-# Or, if you have podman or docker installed, you can run the content from a
-#   container that has a known-good working environment:
+#   installation, if you have podman or docker installed, you can run the
+#   content from a container that has a known-good working environment:
 #     ./run-container.sh -c crc -k ~/.crc/machine/crc/kubeconfig devsecops
 # Then just head to:
 #   https://dashboard.apps-crc.testing
