@@ -11,7 +11,7 @@
           openshift.io/display-name: '{{ gitea_project_display }}'
       spec: {}
 
-- name: Wait for gitea-operator package manifest to be available 
+- name: Wait for gitea-operator package manifest to be available
   k8s_info:
     kubeconfig: '{{ kubeconfig }}'
     api_version: packages.operators.coreos.com/v1
@@ -36,17 +36,7 @@
       apiVersion: redhatgov.io/v1alpha1
       kind: Gitea
       metadata:
-        name: gitea
-      spec:
-        gitea:
-          expose:
-            kind: Route
-            ssl: true
-            uri: gitea-devsecops.apps.cluster-24c2.24c2.example.opentlc.com
-          volumeSize: 4Gi
-        persistent: true
-        postgresql:
-          volumeSize: 4Gi
+        name: gitea-server
   register: gitea_deployment
   until: not gitea_deployment.failed
   retries: 5
