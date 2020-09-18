@@ -40,9 +40,9 @@
         server:
           cheFlavor: codeready
           selfSignedCert: false
-          tlsSupport: true
+          tlsSupport: false
           cheImage: registry.redhat.io/codeready-workspaces/server-rhel8
-          cheImageTag: 2.3
+          cheImageTag: '2.3'
           pluginRegistryImage: registry.redhat.io/codeready-workspaces/pluginregistry-rhel8:2.3
           devfileRegistryImage: registry.redhat.io/codeready-workspaces/devfileregistry-rhel8:2.3
           customCheProperties:
