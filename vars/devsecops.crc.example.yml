@@ -39,20 +39,18 @@ github_project: RedHatGov
 # NOTE: Not really implemented yet....
 pipeline_style: tekton
 
-autoscale: no             # You can't
-adjust_console: no        # You shouldn't
-deploy_quay: no             # You shouldn't
-deploy_automated_build: no  # You shouldn't
+autoscale: no               # You can't
+adjust_console: no          # You shouldn't (crc binary doesn't expect it to change)
+deploy_quay: no             # You shouldn't (you probably don't have the resources, and certs are messy)
+deploy_automated_build: no  # You shouldn't (resource constraints as things come up cause.... problems)
 
 # You can disable these by uncommenting the lines below. They all default to YES.
 # deploy_gitea: no
 # deploy_sonarqube: no
 # deploy_nexus: no
-# deploy_crw: no
 # deploy_pipeline: no
-
-# This will fail if deploy_crw=no, since the workshop dashboard depends on CodeReady Workspaces
-# deploy_workshop: no
+# deploy_crw: no              # NEEDS byo_cert_fullchain_path DEFINED IN common.yml TO WORK
+# deploy_workshop: no         # NEEDS byo_cert_fullchain_path DEFINED IN common.yml TO WORK
 
 # Change quay config definition to allow mirroring of image repositories
 # enable_quay_repo_mirroring: yes

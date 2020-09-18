@@ -1,10 +1,7 @@
 ---
 create_users: true
-letsencrypt: true
 autoscale: true
 adjust_console: true
-
-certificate_path: '{{ tmp_dir }}/certs'
 
 # A list of manually created users:
 manual_users:

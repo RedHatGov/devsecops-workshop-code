@@ -38,7 +38,6 @@ common_included: yes
 #   https://dashboard.apps-crc.testing
 ################################################################################
 
-letsencrypt: no     # You can't
 # You should do uncomment the following and provide a path to a locally-
 #   generated fullchain certificate and key that your computer trusts in PEM
 #   format if you want to bring your own certificates to CRC. They

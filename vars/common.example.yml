@@ -11,21 +11,6 @@ common_included: yes
 # NOTE: IF A VARIABLE IS COMMENTED, IT LIKELY DEFAULTS TO THE OPPOSITE
 ################################################################################
 
-# Uncomment the following for RHPDS-provisioned clusters because right now we
-#   require AWS creds, though this may change in the future. RHPDS provides an
-#   option to do letsencrypt on the api and default router certs, but doesn't
-#   give us the ability to do it for follow-on tasks that won't use the router
-#   cert.
-# letsencrypt: no     # Creates a LetsEncrypt wildcard and api certificate and makes it the default
-
-# Disable letsencrypt, uncomment the following and provide a path to a locally-
-#   generated fullchain certificate and key that your computer trusts in PEM
-#   format if you want to bring your own certificates to the cluster. They
-#   should have a CN or Alias that matches both your cluster API and wildcard
-#   router URLs.
-# byo_cert_fullchain_path: ../tmp/fullchain.pem
-# byo_cert_key_path: ../tmp/key.pem
-
 # The name of the cluster.
 # IF PROVISIONING:
 #   This value will be in your DNS entries and should conform to valid DNS characters.
@@ -114,3 +99,11 @@ cluster_max_nodes_total: 15
 # cluster_max_cores: 100
 # cluster_min_ram_gb: 32
 # cluster_max_ram_gb: 256
+
+# If not using letsencrypt in provision, uncomment the following and provide a
+#   path to a locally-generated fullchain certificate and key that your computer
+#   trusts in PEM format if you want to bring your own certificates to the
+#   cluster. They should have a CN or Alias that matches both your cluster API
+#   and wildcard router URLs.
+# byo_cert_fullchain_path: ../tmp/fullchain.pem
+# byo_cert_key_path: ../tmp/key.pem
