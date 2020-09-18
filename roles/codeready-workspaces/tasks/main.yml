@@ -35,11 +35,14 @@
           openShiftoAuth: false
         database:
           externalDb: false
+          postgresImage: registry.redhat.io/rhel8/postgresql-96:1
         k8s: {}
         server:
           cheFlavor: codeready
           selfSignedCert: false
           tlsSupport: true
+          cheImage: registry.redhat.io/codeready-workspaces/server-rhel8
+          cheImageTag: 2.3
           pluginRegistryImage: registry.redhat.io/codeready-workspaces/pluginregistry-rhel8:2.3
           devfileRegistryImage: registry.redhat.io/codeready-workspaces/devfileregistry-rhel8:2.3
           customCheProperties:
