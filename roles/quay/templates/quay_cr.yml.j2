@@ -20,3 +20,7 @@ spec:
     database:
       volumeSize: 10Gi
     imagePullSecretName: dummy-pull-secret
+    registryStorage:
+      persistentVolumeAccessModes:
+        - ReadWriteOnce
+      persistentVolumeSize: 10Gi
