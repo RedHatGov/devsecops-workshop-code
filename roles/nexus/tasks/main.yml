@@ -83,32 +83,25 @@
   retries: 10
   delay: 30
 
-- name: Retrieve admin password for Nexus
-  shell: |
-    export KUBECONFIG='{{ kubeconfig }}'
-    oc='{{ oc_cli }}'
-    admin_user='{{ workshop_admin.username }}'
-    admin_password='{{ workshop_admin.password }}'
-    if [ $($oc whoami) != "$admin_user" ]; then
-        $oc login --insecure-skip-tls-verify=true -u "$admin_user" -p "$admin_password" &>/dev/null || exit 1
-    fi
+- name: Retrieve nexus admin credentials
+  k8s_info:
+    kubeconfig: '{{ kubeconfig }}'
+    api_version: v1
+    kind: Secret
+    namespace: devsecops
+    name: nexus-admin-credentials
+  register: nexus_credentials
+  until: nexus_credentials.resource|length > 0
 
-    counter=0
-    pod=$($oc get pods -n {{ nexus_project_name }} -l app=nexus -o jsonpath='{.items[0].metadata.name}')
-    while ! $oc exec $pod -n {{ nexus_project_name }} -- [ -f /nexus-data/admin.password ] &>/dev/null; do
-        sleep 1
-        ((counter++))
-        [ $counter -gt 300 ] && exit 1
-    done
-    $oc exec $pod -n {{ nexus_project_name }} -- cat /nexus-data/admin.password || exit 1
-  register: nexus_password
-  changed_when: false
+- name: Set nexus admin password
+  set_fact:
+    nexus_admin_password: '{{ nexus_credentials | json_query("resources[0].data.password") | b64decode }}'
 
 - name: Add deployment user to Nexus instance
   shell: >-
     devsecops-api nexus add-user
     http://{{ nexus_route|json_query("resources[0].spec.host") }}
-    --login-username admin --login-password '{{ nexus_password.stdout }}'
+    --login-username admin --login-password '{{ nexus_admin_password }}'
     --usernames 'deployment'
     --passwords 'deployment123'
   register: deployment_user
@@ -121,7 +114,7 @@
   shell: >-
     devsecops-api nexus add-user
     http://{{ nexus_route|json_query("resources[0].spec.host") }}
-    --login-username admin --login-password '{{ nexus_password.stdout }}'
+    --login-username admin --login-password '{{ nexus_admin_password }}'
     --usernames '{{ workshop_users|json_query("[].username")|join(",") }}'
     --passwords '{{ workshop_users|json_query("[].password")|join(",") }}'
   register: nexus_users
@@ -134,7 +127,7 @@
   shell: >-
     devsecops-api nexus add-repository
     http://{{ nexus_route|json_query("resources[0].spec.host") }}
-    --login-username admin --login-password '{{ nexus_password.stdout }}'
+    --login-username admin --login-password '{{ nexus_admin_password }}'
     --repository-names '{{ workshop_users|json_query("[].username")|join(",") }}'
   register: nexus_repos
   # https://github.com/ansible/ansible/issues/27299
@@ -146,7 +139,7 @@
   shell: >-
     devsecops-api nexus add-proxy-repository
     http://{{ nexus_route|json_query("resources[0].spec.host") }}
-    --login-username admin --login-password '{{ nexus_password.stdout }}'
+    --login-username admin --login-password '{{ nexus_admin_password }}'
     --repository-name 'redhat-ga-proxy'
     --remote-repo-url 'https://maven.repository.redhat.com/ga/'
   register: redhat_ga_proxy
@@ -159,7 +152,7 @@
   shell: >-
     devsecops-api nexus update-group-repo
     http://{{ nexus_route|json_query("resources[0].spec.host") }}
-    --login-username admin --login-password '{{ nexus_password.stdout }}'
+    --login-username admin --login-password '{{ nexus_admin_password }}'
     --group-repository-name 'maven-public'
     --member-repository-names 'maven-releases,maven-snapshots,maven-central,redhat-ga-proxy'
   register: maven_public_repo
