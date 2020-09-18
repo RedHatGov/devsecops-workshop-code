@@ -91,7 +91,7 @@
     namespace: devsecops
     name: nexus-admin-credentials
   register: nexus_credentials
-  until: nexus_credentials.resource|length > 0
+  until: nexus_credentials.resources|length > 0
 
 - name: Set nexus admin password
   set_fact:
