@@ -43,10 +43,14 @@
           tlsSupport: false
           cheImage: registry.redhat.io/codeready-workspaces/server-rhel8
           cheImageTag: '2.3'
-          pluginRegistryImage: registry.redhat.io/codeready-workspaces/pluginregistry-rhel8:2.3
-          devfileRegistryImage: registry.redhat.io/codeready-workspaces/devfileregistry-rhel8:2.3
+          pluginRegistryImage: quay.io/redhatgov/crw-plugin-registry-rhel8:2.3
+          devfileRegistryImage: quay.io/redhatgov/crw-devfile-registry-rhel8:2.3
           customCheProperties:
             CHE_LIMITS_WORKSPACE_IDLE_TIMEOUT: "0"
+            CHE_INFRA_KUBERNETES_PVC_JOBS_IMAGE: registry.redhat.io/ubi8-minimal:8.2
+            CHE_WORKSPACE_PLUGIN__BROKER_ARTIFACTS_IMAGE: registry.redhat.io/codeready-workspaces/pluginbroker-artifacts-rhel8:2.3
+            CHE_WORKSPACE_PLUGIN__BROKER_METADATA_IMAGE: registry.redhat.io/codeready-workspaces/pluginbroker-metadata-rhel8:2.3
+            CHE_SERVER_SECURE__EXPOSER_JWTPROXY_IMAGE: registry.redhat.io/codeready-workspaces/jwtproxy-rhel8:2.3
         storage:
           preCreateSubPaths: true
           pvcClaimSize: 1Gi
