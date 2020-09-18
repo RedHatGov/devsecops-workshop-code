@@ -58,3 +58,6 @@ pipeline_style: tekton
 
 # Change quay config definition to allow mirroring of image repositories
 # enable_quay_repo_mirroring: yes
+
+# Change this to affect the NAPS Community operator catalog index
+# naps_operator_index_image: quay.io/redhatgov/operator-catalog:1.1.1
