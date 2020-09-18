@@ -40,7 +40,9 @@
       spec:
         persistent: true
         nexus:
-          volumeSize: 10Gi
+          allowAnonymousAccess: true
+          oauth:
+            enabled: false
   register: nexus_deployment
   until: not nexus_deployment.failed
   retries: 5
