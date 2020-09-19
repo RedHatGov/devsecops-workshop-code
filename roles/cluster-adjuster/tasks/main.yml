@@ -12,3 +12,10 @@
 
 - include_tasks: console.yml
   when: adjust_console
+
+- include_tasks: byo_cert.yml
+  when:
+    - byo_cert_fullchain_path is defined
+    - byo_cert_fullchain_path != ""
+    - byo_cert_key_path is defined
+    - byo_cert_key_path != ""
