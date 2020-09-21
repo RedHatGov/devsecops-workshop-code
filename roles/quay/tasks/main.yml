@@ -20,7 +20,7 @@
     validate_certs: no
   register: quay_index
   until: '"DOCTYPE html" in quay_index.content'
-  retries: 10
+  retries: 20
   delay: 30
 
 - name: Add users to Quay instance
