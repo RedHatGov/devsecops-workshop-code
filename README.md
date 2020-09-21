@@ -49,7 +49,7 @@ Here's what you need to get the workshop deployed quickly onto an RHPDS cluster.
 1. Wait for the email from RHPDS with your cluster GUID and login information.
 1. Edit `vars/cluster/common.yml` to change the following values:
    1. `cluster_name` should be changed to the value after `api.` or `apps.` but before the next `.` in the domain name from the email. For example, given the API url `https://api.cluster-4b04.4b04.example.opentlc.com`, set `cluster_name: cluster-4b04`
-   1. `openshift_base_domain` should be changed to the entire res of the `url` after `cluster_name`. For example, given the API url `https://api.cluster-4b04.4b04.example.opentlc.com` set `openshift_base_domain: 4b04.example.opentlc.com`
+   1. `openshift_base_domain` should be changed to the entire rest of the `url` after `cluster_name`. For example, given the API url `https://api.cluster-4b04.4b04.example.opentlc.com` set `openshift_base_domain: 4b04.example.opentlc.com`
    1. Scroll down in `common.yml` until you see a section talking about customizing your deployment. You should edit `manual_users`, `workshop_admin`, and `number_of_users` to your desired configuration. The remaining settings are optional and you may choose to configure them if you wish.
 1. Log in to your RPHDS cluster using `kubectl` or `oc` and the credentials provided in the RHPDS email.
 1. Deploy everything using your staged answers and cached login:
@@ -188,7 +188,7 @@ Quay is sometimes flakey. I don't know what else to say about it. Sometimes it f
    1. Use the three-dots menu to the right of the QuayEcosystem named _quayecosystem_ and choose "Delete QuayEcosystem."
    1. Wait for the resources to be cleaned up - you can track the pods in _Workloads_ -> _Pods_ and the storage resources in _Storage_ -> _Persistent Volume Claims_.
    1. Head back to the _Installed Operators_ listing and click the three-dots menu to the right of the Red Hat Quay operator, choosing "Uninstall Operator."
-   1. Head to _Home_ -> _Projects_ and scroll down to the _quay-enterprise` project. Click the three-dots menu to the right of it and choose "Delete Project."
+   1. Head to _Home_ -> _Projects_ and scroll down to the _quay-enterprise_ project. Click the three-dots menu to the right of it and choose "Delete Project."
    1. Wait for the project to disappear from the listing, then rerun the command that got you to a failed Quay. It will probably just work now!
 
 ## Contributing
