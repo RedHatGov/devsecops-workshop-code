@@ -5,6 +5,10 @@ Role Name
 A role to install mattermost on OpenShift. Currently this role only supports deployment via a Red Hat written mattermost operator. 
 =======
 A brief description of the role goes here.
+<<<<<<< HEAD
+>>>>>>> initial mattermost work
+=======
+>>>>>>> 62f6310... initial mattermost work
 >>>>>>> initial mattermost work
 
 Requirements
@@ -94,6 +98,10 @@ Dependencies
 ------------
 
 A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+<<<<<<< HEAD
+>>>>>>> initial mattermost work
+=======
+>>>>>>> 62f6310... initial mattermost work
 >>>>>>> initial mattermost work
 
 Example Playbook
@@ -150,6 +158,10 @@ Including an example of how to use your role (for instance, with variables passe
 License
 -------
 
+<<<<<<< HEAD
+>>>>>>> initial mattermost work
+=======
+>>>>>>> 62f6310... initial mattermost work
 >>>>>>> initial mattermost work
 BSD
 
@@ -160,4 +172,8 @@ Author Information
 =======
 
 An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+<<<<<<< HEAD
+>>>>>>> initial mattermost work
+=======
+>>>>>>> 62f6310... initial mattermost work
 >>>>>>> initial mattermost work
