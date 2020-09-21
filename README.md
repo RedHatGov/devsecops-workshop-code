@@ -58,7 +58,7 @@ Here's what you need to get the workshop deployed quickly onto an RHPDS cluster.
    ./run-container.sh -c cluster -k ~/.kube/config devsecops
    ```
 
-1. If anything failed, you can rerun the same command to try again. Sometimes for one reason or another there are timeout issues, but the deployment is fully idempotent. This is relatively rare now. In the event that the deployment fails on the same step more than once, create an issue on GitHub and/or ping one of us on GChat.
+1. If Quay fails in some say, try rerunning the same command. If it still fails, completely uninstall and reinstall Quay and the operator by following [these short steps](#quay-problems). If anything else failed, try rerunning the same command. Sometimes for one reason or another there are timeout issues, but the deployment is fully idempotent. This is relatively rare now. In the event that the deployment fails on the same step (other than Quay) more than once, create an issue on GitHub and/or ping one of us on GChat.
 1. Access your cluster at `console.apps.{{ cluster_name }}.{{ openshift_base_domain }}` - note that the Console route was shortened from the RHPDS default. Your students should sign in at `dashboard.apps.{{ cluster_name }}.{{ openshift_base_domain }}`.
 
 ## Other use cases
@@ -176,6 +176,20 @@ The primary function of these variables is to provide information necessary to t
 #### vars/CLUSTER/devsecops.yml
 
 This mostly contains switches to enable or disable workshop services and infrastructure. It's also where you configure the pull token for students to use a Service Account on the terms-based registry for JBoss images.
+
+## Quay problems
+
+Quay is sometimes flakey. I don't know what else to say about it. Sometimes it fails non-deterministically to deploy and emits very little troubleshooting information. Once it's up it generally behaves better, but getting it there is a little weird some times. You can take the following steps to completely uninstall Quay and the Quay Operator to try redeploying them:
+
+   1. Open the console (note that the console route may have changed during deployment), sign in as an administrator, and navigate to _Operators_ -> _Installed Operators_.
+   1. Change to the _quay-enterprise_ project.
+   1. Click on the Red Hat Quay operator.
+   1. Navigate to the QuayEcosystem tab of the operator page.
+   1. Use the three-dots menu to the right of the QuayEcosystem named _quayecosystem_ and choose "Delete QuayEcosystem."
+   1. Wait for the resources to be cleaned up - you can track the pods in _Workloads_ -> _Pods_ and the storage resources in _Storage_ -> _Persistent Volume Claims_.
+   1. Head back to the _Installed Operators_ listing and click the three-dots menu to the right of the Red Hat Quay operator, choosing "Uninstall Operator."
+   1. Head to _Home_ -> _Projects_ and scroll down to the _quay-enterprise` project. Click the three-dots menu to the right of it and choose "Delete Project."
+   1. Wait for the project to disappear from the listing, then rerun the command that got you to a failed Quay. It will probably just work now!
 
 ## Contributing
 
