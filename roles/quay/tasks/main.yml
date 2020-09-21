@@ -13,9 +13,6 @@
   retries: 5
   delay: 10
 
-- include_tasks: validate_route.yml
-  when: quay_deployment.changed
-
 - name: Wait for Quay route to begin answering requests
   uri:
     url: 'https://{{ quay_route }}/'
@@ -29,7 +26,7 @@
 - name: Add users to Quay instance
   shell: >-
     devsecops-api quay add-user https://{{ quay_route }}
-    --login-username quay --login-password '{{ quay_password }}'
+    --login-username quay --login-password password
     --usernames '{{ workshop_users|json_query("[].username")|join(",") }}'
     --passwords '{{ workshop_users|json_query("[].password")|join(",") }}'
   register: quay_users
