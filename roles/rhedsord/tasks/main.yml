@@ -20,3 +20,6 @@
 - include_role:
     name: quay
   when: deploy_quay
+- include_role:
+    name: mattermost
+  when: deploy_mattermost_operator
