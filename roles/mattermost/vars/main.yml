@@ -1,0 +1,5 @@
+---
+authentication:
+  keycloak:
+    realmUrl: 'https://keycloak-rhsso.apps.sparta.spo.io/auth/realms/openshift'
+    secret: 1f6d2d53-6c46-46e9-860c-4ed0c80b703b
