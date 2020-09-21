@@ -41,10 +41,10 @@ pipeline_style: tekton
 
 autoscale: no               # You can't
 adjust_console: no          # You shouldn't (crc binary doesn't expect it to change)
-deploy_quay: no             # You shouldn't (you probably don't have the resources, and certs are messy)
 deploy_automated_build: no  # You shouldn't (resource constraints as things come up cause.... problems)
 
 # You can disable these by uncommenting the lines below. They all default to YES.
+# deploy_quay: no
 # deploy_gitea: no
 # deploy_sonarqube: no
 # deploy_nexus: no
