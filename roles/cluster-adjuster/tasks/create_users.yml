@@ -83,7 +83,7 @@
     oc='{{ oc_cli }}'
     admin_user='{{ workshop_admin.username }}'
     admin_password='{{ workshop_admin.password }}'
-    if [ $($oc whoami) != "$admin_user" ]; then
+    if [ $($oc --insecure-skip-tls-verify=true whoami) != "$admin_user" ]; then
         $oc login --insecure-skip-tls-verify=true -u "$admin_user" -p "$admin_password" && echo changed || echo failed
     else
         echo ok
