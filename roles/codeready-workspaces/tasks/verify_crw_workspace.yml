@@ -44,4 +44,4 @@
     msg: >-
       Unable to start the workspace. CRW for {{ user.username }} may not be
       fully hotloaded, but this failure shouldn't be catastrophic.
-  when: workspace_start.failed
+  when: workspace_start.failed is defined

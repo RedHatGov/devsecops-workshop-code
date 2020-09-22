@@ -38,3 +38,21 @@
   changed_when: user_creation.status == 201
   retries: 10
   delay: 10
+
+- name: Get {{ user.username }} OpenShift token
+  community.kubernetes.k8s_auth:
+    username: "{{ user.username }}"
+    password: "{{ user.password }}"
+    host: 'https://api.{{ full_cluster_name }}:6443'
+    validate_certs: no
+  register: k8s_auth_result
+
+- set_fact:
+    link_token: '{"access_token":"{{ k8s_auth_result.k8s_auth.api_key }}","expires_in":86400,"scope":"user:full","token_type":"Bearer"}'
+
+- name: Link {{ user.username }} Keycloak and OCP accounts
+  community.kubernetes.k8s_exec:
+    kubeconfig: '{{ kubeconfig }}'
+    namespace: "{{ crw_project_name }}"
+    pod: '{{ postgres_pod_name }}'
+    command: psql -d keycloak -c "UPDATE federated_identity SET token=$${{ link_token }}$$ WHERE federated_username=$${{ user.username }}$$;"
