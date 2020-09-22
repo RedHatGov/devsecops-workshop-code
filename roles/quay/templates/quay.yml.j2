@@ -39,28 +39,3 @@
   type: kubernetes.io/dockerconfigjson
   data:
     .dockerconfigjson: ewogICJhdXRocyI6IHsKICAgICJxdWF5LmlvIjogewogICAgICAiYXV0aCI6ICJjbVZrYUdGMEszRjFZWGs2VHpneFYxTklVbE5LVWpFMFZVRmFRa3MxTkVkUlNFcFRNRkF4VmpSRFRGZEJTbFl4V0RKRE5GTkVOMHRQTlRsRFVUbE9NMUpGTVRJMk1USllWVEZJVWc9PSIsCiAgICAgICJlbWFpbCI6ICIiCiAgICB9CiAgfQp9
-
-# Secret to change default password for super-user
-- apiVersion: v1
-  kind: Secret
-  metadata:
-    name: quay-superuser
-    namespace: quay-enterprise
-  type: Opaque
-  stringData:
-    superuser-username: quay
-    superuser-password: {{ quay_password }}
-    superuser-email: quay@redhat.com
-
-{% if do_quay_certs|bool %}
-# Secret to use cluster certs for Quay
-- apiVersion: v1
-  kind: Secret
-  metadata:
-    name: quay-tls-certs
-    namespace: quay-enterprise
-  type: kubernetes.io/tls
-  data:
-    tls.crt: {{ lookup("file", certificate_path + "/quay-fullchain.pem")|b64encode }}
-    tls.key: {{ lookup("file", certificate_path + "/quay-key.pem")|b64encode }}
-{% endif %}

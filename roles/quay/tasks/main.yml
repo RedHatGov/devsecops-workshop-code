@@ -1,11 +1,4 @@
 ---
-- name: Determine if we should do quay certs
-  set_fact:
-    do_quay_certs: (letsencrypt|bool and (AWS_ACCESS_KEY_ID is defined or ansible_env["AWS_ACCESS_KEY_ID"] is defined) and (AWS_ACCESS_KEY_ID|default("") != "" or ansible_env["AWS_ACCESS_KEY_ID"]|default("") != ""))|bool
-
-- include_tasks: certificates.yml
-  when: '{{ do_quay_certs }}'
-
 - name: Subscribe to Quay Enterprise
   k8s:
     kubeconfig: '{{ kubeconfig }}'
@@ -20,9 +13,6 @@
   retries: 5
   delay: 10
 
-- include_tasks: validate_route.yml
-  when: quay_deployment.changed
-
 - name: Wait for Quay route to begin answering requests
   uri:
     url: 'https://{{ quay_route }}/'
@@ -30,13 +20,13 @@
     validate_certs: no
   register: quay_index
   until: '"DOCTYPE html" in quay_index.content'
-  retries: 10
+  retries: 20
   delay: 30
 
 - name: Add users to Quay instance
   shell: >-
     devsecops-api quay add-user https://{{ quay_route }}
-    --login-username quay --login-password '{{ quay_password }}'
+    --login-username quay --login-password password
     --usernames '{{ workshop_users|json_query("[].username")|join(",") }}'
     --passwords '{{ workshop_users|json_query("[].password")|join(",") }}'
   register: quay_users

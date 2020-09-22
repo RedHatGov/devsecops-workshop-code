@@ -30,7 +30,7 @@ projects:
 
 
 # The project from which custom Operators and other tooling will be pulled
-github_project: jharmison-redhat
+github_project: RedHatGov
 # NOTE: If the operators themselves still point to another image on Quay, the
 #   operator coming from this repo won't affect the images themselves.
 
@@ -39,23 +39,21 @@ github_project: jharmison-redhat
 # NOTE: Not really implemented yet....
 pipeline_style: tekton
 
-autoscale: no             # You can't
-adjust_console: no        # You shouldn't
-deploy_ocs: no            # You can't
-deploy_service_mesh: no   # You shouldn't
-deploy_3scale: no         # You can't
-deploy_quay: no             # You shouldn't
-deploy_automated_build: no  # You shouldn't
+autoscale: no               # You can't
+adjust_console: no          # You shouldn't (crc binary doesn't expect it to change)
+deploy_automated_build: no  # You shouldn't (resource constraints as things come up cause.... problems)
 
 # You can disable these by uncommenting the lines below. They all default to YES.
+# deploy_quay: no
 # deploy_gitea: no
 # deploy_sonarqube: no
 # deploy_nexus: no
-# deploy_crw: no
 # deploy_pipeline: no
-
-# This will fail if deploy_crw=no, since the workshop dashboard depends on CodeReady Workspaces
-# deploy_workshop: no
+# deploy_crw: no              # NEEDS byo_cert_fullchain_path DEFINED IN common.yml TO WORK
+# deploy_workshop: no         # NEEDS byo_cert_fullchain_path DEFINED IN common.yml TO WORK
 
 # Change quay config definition to allow mirroring of image repositories
-enable_quay_repo_mirroring: yes
+# enable_quay_repo_mirroring: yes
+
+# Change this to affect the NAPS Community operator catalog index
+# naps_operator_index_image: quay.io/redhatgov/operator-catalog:1.1.1

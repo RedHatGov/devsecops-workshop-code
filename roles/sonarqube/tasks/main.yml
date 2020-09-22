@@ -11,43 +11,32 @@
           openshift.io/display-name: '{{ sonarqube_project_display }}'
       spec: {}
 
-- name: Deploy resources for SonarQube Operator
+- name: Wait for sonarqube-operator package manifest to be available
+  k8s_info:
+    kubeconfig: '{{ kubeconfig }}'
+    api_version: packages.operators.coreos.com/v1
+    kind: PackageManifest
+    namespace: openshift-marketplace
+    name: sonarqube-operator
+  register: sonarqube_package_manifest
+  until: sonarqube_package_manifest.resources|length > 0 and (sonarqube_package_manifest.resources|first).status.catalogSource == "redhatgov-operators"
+  retries: 5
+  delay: 10
+
+- name: Subscribe to sonarqube
   k8s:
     kubeconfig: '{{ kubeconfig }}'
-    namespace: '{{ resource.namespace|default(omit) }}'
-    definition: '{{ lookup("url", resource.url, split_lines=False)|from_yaml|regex_replace("REPLACE_ME", sonarqube_project_name) }}'
-  loop:
-    - name: crd
-      url: https://raw.githubusercontent.com/{{ github_project }}/sonarqube-operator/master/deploy/crds/gpte_v1alpha1_gsonarqube_crd.yaml
-    - name: cluster_role
-      url: https://raw.githubusercontent.com/{{ github_project }}/sonarqube-operator/master/deploy/cluster_role.yaml
-    - name: service_account
-      url: https://raw.githubusercontent.com/{{ github_project }}/sonarqube-operator/master/deploy/service_account.yaml
-      namespace: '{{ sonarqube_project_name }}'
-    - name: cluster_role_binding
-      url: https://raw.githubusercontent.com/{{ github_project }}/sonarqube-operator/master/deploy/cluster_role_binding.yaml
-      namespace: '{{ sonarqube_project_name }}'
-    - name: operator
-      url: https://raw.githubusercontent.com/{{ github_project }}/sonarqube-operator/master/deploy/operator.yaml
-      namespace: '{{ sonarqube_project_name }}'
-  loop_control:
-    loop_var: resource
-    label: '{{ resource.name }}'
+    definition: '{{ lookup("template", "sonarqube-subscription.yml.j2")|from_yaml }}'
 
 - name: Create SonarQube from a CR
   k8s:
     kubeconfig: '{{ kubeconfig }}'
     namespace: '{{ sonarqube_project_name }}'
     definition:
-      apiVersion: gpte.opentlc.com/v1alpha1
+      apiVersion: redhatgov.io/v1alpha1
       kind: Sonarqube
       metadata:
         name: sonarqube
-      spec:
-        postgresqlVolumeSize: 4Gi
-        sonarqubeVolumeSize: 4Gi
-        sonarqubeServiceName: sonarqube
-        sonarqubeSsl: true
   register: sq_deployment
   until: not sq_deployment.failed
   retries: 5
