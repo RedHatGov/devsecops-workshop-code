@@ -7,7 +7,7 @@ spec:
   clair:
     enabled: false
   quay:
-{% if (enable_quay_repo_mirroring|default(false)) %}
+{% if enable_quay_repo_mirroring|bool %}
     enableRepoMirroring: true
 {% endif %}
     externalAccess:
