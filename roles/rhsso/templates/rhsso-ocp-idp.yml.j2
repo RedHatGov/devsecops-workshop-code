@@ -8,7 +8,7 @@
     clientID: "openshift"
     clientSecret:
       name: keycloak-client-secret-openshift
-{% if connected_cluster is false %}
+{% if not trusted_router_certificates|bool %}
     ca:
       name: ca-config-map
 {% endif %}
