@@ -14,53 +14,48 @@
       - "quay-enterprise-component=app"
   register: quay_pod
 
-
-
 - name: Create RHSSO Client definition for Quay
   k8s:
     kubeconfig: '{{ kubeconfig }}'
     definition: '{{ lookup("template", "../templates/rhsso-quay-client.yml.j2")|from_yaml }}'
 
-- name: Configure RHSSO as an OIDC provider for Quay
-  block: 
-    - name: Get Quay config secret
-      k8s_info:
-        kubeconfig: '{{ kubeconfig }}'
-        api_version: v1
-        kind: Secret
-        namespace: '{{ quay_project_name }}'
-        name: quay-enterprise-config-secret
-      register: quay_config_secret
+- name: Get Quay config secret
+  k8s_info:
+    kubeconfig: '{{ kubeconfig }}'
+    api_version: v1
+    kind: Secret
+    namespace: '{{ quay_project_name }}'
+    name: quay-enterprise-config-secret
+  register: quay_config_secret
 
-    - name: Save Quay config.yaml to temp file
-      copy:
-        content: "{{ quay_config_secret.resources[0].data['config.yaml'] | b64decode }}"
-        dest: "{{ tmp_dir }}/quay-config.yml"
+- name: Save Quay config.yaml to temp file
+  copy:
+    content: "{{ quay_config_secret.resources[0].data['config.yaml'] | b64decode }}"
+    dest: "{{ tmp_dir }}/quay-config.yml"
 
-    - name: Append RHSSO config to Quay config
-      blockinfile:
-        marker: "# {mark} TISC RHSSO Config"
-        backup: yes
-        block: "{{ lookup('template', './templates/quay-config-rhsso-block.yml.j2') }}"
-        path: "{{ tmp_dir }}/quay-config.yml"
-      register: rhsso_config_added
+- name: Append RHSSO config to Quay config
+  blockinfile:
+    marker: "# {mark} TISC RHSSO Config"
+    backup: yes
+    block: "{{ lookup('template', './templates/quay-config-rhsso-block.yml.j2') }}"
+    path: "{{ tmp_dir }}/quay-config.yml"
+  register: rhsso_config_added
 
-    - name: Patch the secret with the update quay config value
-      k8s_json_patch:
-        kubeconfig: '{{ kubeconfig }}'
-        api_version: v1
-        kind: Secret
-        namespace: '{{ quay_project_name }}'
-        name: quay-enterprise-config-secret
-        patch:
-        - op: replace
-          path: /data/config.yaml
-          value: "{{ lookup('file', tmp_dir + '/quay-config.yml') | b64encode }}"
-      when: rhsso_config_added.changed    
-
+- name: Patch the secret with the update quay config value
+  k8s_json_patch:
+    kubeconfig: '{{ kubeconfig }}'
+    api_version: v1
+    kind: Secret
+    namespace: '{{ quay_project_name }}'
+    name: quay-enterprise-config-secret
+    patch:
+    - op: replace
+      path: /data/config.yaml
+      value: "{{ lookup('file', tmp_dir + '/quay-config.yml') | b64encode }}"
+  when: rhsso_config_added.changed
 
 - name : Restart quay if the RHSSO changes were applied
-  block:    
+  block:
   - name: Kill quay pod for auth changes to take into effect
     k8s:
       kubeconfig: '{{ kubeconfig }}'
@@ -82,4 +77,4 @@
     until: quay_pod.resources|length > 0 and (quay_pod.resources|first).status.phase == "Running"
     retries: 10
     delay: 30
-  when: rhsso_config_added.changed  
+  when: rhsso_config_added.changed
