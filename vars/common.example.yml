@@ -2,7 +2,14 @@
 # This tells the playbooks to not try to include default-named vars files
 common_included: yes
 
-connected_cluster: true
+# This toggle indicates whether or not the cluster is connected to the internet
+#   and can pull content sources from their normal places
+connected_cluster: yes
+
+# This toggle indicates whether the cluster router certificates are trusted by
+#   the default bundles on most operating system images (and therefore would be
+#   trusted by most hosts and container images validating them)
+trusted_router_certificates: yes
 
 ################################################################################
 # The following variables are especially important to pay attention to if you're
@@ -73,11 +80,11 @@ generated_password: "{{ lookup('password', '../tmp/rhssopasswd.txt length=15 cha
 ################################################################################
 #
 # User attributes
-# - username: 
-#   firstName: 
-#   lastName: 
-#   password: 
-#   email: 
+# - username:
+#   firstName:
+#   lastName:
+#   password:
+#   email:
 #   admin: # boolean, yes or true if this user is a cluster admin
 #   jenkinsRole: # Set to 'admin', 'edit', 'view', or leave undefined if no jenkins access is needed
 #   realmRoles: # list of Realm defined roles assigned to user
