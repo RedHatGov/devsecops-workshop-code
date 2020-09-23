@@ -11,8 +11,8 @@
       matchLabels:
         app: {{ rhsso_app_label }}
     client:
-      clientId: {{ rhsso_gitea_client_id }} 
-      secret: {{ rhsso_gitea_secret }} 
+      clientId: {{ rhsso_gitea_client_id }}
+      secret: {{ rhsso_gitea_secret }}
       name: {{ rhsso_gitea_client_id }}
       enabled: true
       clientAuthenticatorType: client-secret
@@ -21,4 +21,3 @@
         - 'https://gitea-{{ gitea_project_name }}.apps.{{ subdomain }}/*'
       rootUrl: 'https://gitea-{{ gitea_project_name }}.apps.{{ subdomain }}/'
       protocol: openid-connect
-
