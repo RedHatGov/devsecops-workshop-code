@@ -11,7 +11,7 @@
   register: quay_deployment
   until: not quay_deployment.failed
   retries: 5
-  delay: 10
+  delay: 20
 
 - name: Wait for Quay route to begin answering requests
   uri:
