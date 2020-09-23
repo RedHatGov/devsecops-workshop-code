@@ -2,7 +2,7 @@
 
 - name: Generate a Quay secret for RHSSO
   set_fact:
-    rhsso_quay_secret: "{{ lookup('password', '/dev/null length=15 chars=ascii_letters') }}"
+    rhsso_quay_secret: "{{ lookup('password', tmp_dir +'/rhsso_quay.secret length=15 chars=ascii_letters') }}"
 
 - name: Get Quay pod info
   k8s_info:
