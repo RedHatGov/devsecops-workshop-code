@@ -48,7 +48,7 @@
         headers:
           Content-Type: application/json
           Authorization: "Bearer {{ rh_sso_admin_token.json.access_token }}"
-        return_content: yes      
+        return_content: yes
         status_code: 200
       register: all_clients
 
@@ -60,7 +60,7 @@
         headers:
           Content-Type: application/json
           Authorization: "Bearer {{ rh_sso_admin_token.json.access_token }}"
-        return_content: yes      
+        return_content: yes
         status_code: 200
       register: all_client_scopes
 
@@ -72,7 +72,7 @@
     - set_fact:
          sonarqube_client_id: "{{ sonarqube_client.id }}"
          sonarqube_client_has_role_list: "{{ 'role_list' in sonarqube_client.defaultClientScopes }}"
-         role_list_client_scope_id: "{{ all_client_scopes.json | json_query(role_list_scope_query) | first }}"  
+         role_list_client_scope_id: "{{ all_client_scopes.json | json_query(role_list_scope_query) | first }}"
       vars:
         role_list_scope_query: "[?name == 'role_list'].id"
 
@@ -84,7 +84,7 @@
         headers:
           Content-Type: application/json
           Authorization: "Bearer {{ rh_sso_admin_token.json.access_token }}"
-        return_content: yes      
+        return_content: yes
         status_code: 204
       when: sonarqube_client_has_role_list
     # ------------------------ end of role_list removal -------------------------------------
@@ -100,14 +100,14 @@
       headers:
         Content-Type: application/json
         Authorization: "Bearer {{ rh_sso_admin_token.json.access_token }}"
-      return_content: yes      
+      return_content: yes
       status_code: 200
     register: realm_keys
 
   - set_fact:
-      rhsso_saml_cert_value: "{{ realm_keys.json | json_query(cert_query) | first }}"    
-    vars: 
-      cert_query: "keys[?type == 'RSA'].certificate"  
+      rhsso_saml_cert_value: "{{ realm_keys.json | json_query(cert_query) | first }}"
+    vars:
+      cert_query: "keys[?type == 'RSA'].certificate"
 
   - name: Update sonarqube settings
     shell: >-
