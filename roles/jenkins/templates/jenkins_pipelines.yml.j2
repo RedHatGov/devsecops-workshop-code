@@ -38,7 +38,7 @@
                       def pom = readMavenPom file: 'pom.xml'
                       version = pom.version
                   }
-                  
+
                   sh "${mvnCmd} install -DskipTests=true"
                 }
               }
@@ -225,8 +225,8 @@
                       version = pom.version
                       gitRev = sh(returnStdout: true, script: "git rev-parse --verify --short HEAD").trim()
                   }
-                  
-                  
+
+
                   sh "${mvnCmd} install -DskipTests=true"
                 }
               }
@@ -324,7 +324,7 @@
                   }
                 }
               }
-              
+
             }
           }
         env:
@@ -378,11 +378,11 @@
                     if (env.APP_VERSION == "") {
                       echo "Deploy to stage pipeline requires specifying APP_VERSION to deploy as an environmental variable"
                       sh "exit 1"
-                    }       
-                  }            
+                    }
+                  }
                 }
               }
-              
+
               stage('Promote to STAGE') {
                 steps {
                   script {

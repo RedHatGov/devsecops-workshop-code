@@ -12,7 +12,7 @@
       spec: {}
 
 # https://docs.openshift.com/container-platform/4.5/openshift_images/using_images/images-other-jenkins.html#images-other-jenkins-env-var_images-other-jenkins
-# looks like the env var OVERRIDE_PV_PLUGINS_WITH_IMAGE_PLUGINS would mean that we don't have to worry as long as the default plugins are sufficient 
+# looks like the env var OVERRIDE_PV_PLUGINS_WITH_IMAGE_PLUGINS would mean that we don't have to worry as long as the default plugins are sufficient
 
 - name: Ensure Jenkins controller ImageStream exists in disconnected cluster
   when: not connected_cluster
