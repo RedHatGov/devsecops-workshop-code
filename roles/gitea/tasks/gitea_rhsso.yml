@@ -2,7 +2,7 @@
 
 - name: Generate a Gitea secret for RHSSO
   set_fact:
-    rhsso_gitea_secret: "{{ lookup('password', '/dev/null length=15 chars=ascii_letters') }}"
+    rhsso_gitea_secret: "{{ lookup('password', tmp_dir + '/gitea.secret length=15 chars=ascii_letters') }}"
 
 - name: Create RHSSO Client definition for Gitea
   k8s:
