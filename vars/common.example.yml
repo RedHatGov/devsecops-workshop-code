@@ -86,7 +86,8 @@ generated_password: "{{ lookup('password', '../tmp/rhssopasswd.txt length=15 cha
 #   password:
 #   email:
 #   admin: # boolean, yes or true if this user is a cluster admin
-#   jenkinsRole: # Set to 'admin', 'edit', 'view', or leave undefined if no jenkins access is needed
+#   jenkinsRole: # Set to 'admin', 'edit', 'view', or leave undefined if no access to jenkins is needed
+#   nexusRole: # Set to valid role for nexus, or leave undefined if no access to nexus is needed
 #   realmRoles: # list of Realm defined roles assigned to user
 #   clientRoles: # RH-SSO Clients may have custom roles, for each client provide a list of client specific roles to assign
 #     rh-sso-client-name:
@@ -144,6 +145,7 @@ sequence_users: |
       password: "{{ generated_password }}"
       email: {{ username }}@example.com
       jenkinsRole: edit
+      nexusRole: nx-admin
   {% endfor -%}
 
 # The users to create in OpenShift
