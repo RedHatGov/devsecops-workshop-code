@@ -8,28 +8,51 @@
   k8s:
     kubeconfig: '{{ kubeconfig }}'
     definition: '{{ lookup("template", "../templates/rhsso-gitea-client.yml.j2")|from_yaml }}'
+  register: rhsso_client
 
-- name: Configure RHSSO as an OAuth2 provider for Gitea
+- name: Check if Gitea OAuth provider exists
   shell: |
     export KUBECONFIG='{{ kubeconfig }}'
     oc='{{ oc_cli }}'
 
     pod=$($oc get pods -n {{ gitea_project_name }} -l {{ gitea_pod_label }} -o jsonpath='{.items[0].metadata.name}')
-    echo "running: 'gitea admin add-oauth' CLI in container"
+    $oc exec $pod -n {{ gitea_project_name }} -- /home/gitea/gitea --config=/home/gitea/conf/app.ini admin auth list |& grep -F rhsso
+  changed_when: false
+  failed_when: false
+  register: gitea_oauth_config
 
-    output=$($oc exec $pod -n {{ gitea_project_name }} -- /home/gitea/gitea --config=/home/gitea/conf/app.ini admin auth add-oauth --name=rhsso --provider openidConnect --key {{ rhsso_gitea_client_id }} --secret {{ rhsso_gitea_client_id }} --auto-discover-url  https://keycloak-{{ rhsso_project_name }}.apps.{{ subdomain }}/auth/realms/{{ rhsso_realm_name }}/.well-known/openid-configuration 2>&1)
+- name: Configure RHSSO as an OAuth2 provider for Gitea
+  shell: |
+    export KUBECONFIG='{{ kubeconfig }}'
+    oc='{{ oc_cli }}'
+    pod=$($oc get pods -n {{ gitea_project_name }} -l {{ gitea_pod_label }} -o jsonpath='{.items[0].metadata.name}')
 
-    if echo "$output" | grep -qF 'login source already exists'; then
+    {% if "rhsso" not in gitea_oauth_config.stdout %}
+      echo "Gitea needs to be configured with the RHSSO client"
+      output=$($oc exec $pod -n {{ gitea_project_name }} -- /home/gitea/gitea --config=/home/gitea/conf/app.ini admin auth add-oauth --name=rhsso --provider openidConnect --key {{ rhsso_gitea_client_id }} --secret {{ rhsso_gitea_client_id }} --auto-discover-url  https://keycloak-{{ rhsso_project_name }}.apps.{{ subdomain }}/auth/realms/{{ rhsso_realm_name }}/.well-known/openid-configuration 2>&1)
+      if echo "$output" | grep -qF 'login source already exists'; then
+          echo ok
+      elif echo "$output" | grep -qF 'Failed to run app'; then
+          echo failed
+      elif echo "$output" | grep -qE 'INSERT INTO "login_source"'; then
+          echo changed
+      else
+          echo failed
+      fi
+    {% elif rhsso_client.changed %}
+      echo "Gitea RHSSO client needs new secret updated"
+      output=$($oc exec $pod -n {{ gitea_project_name }} -- /home/gitea/gitea --config=/home/gitea/conf/app.ini admin auth update-oauth --id {{ gitea_oauth_config.stdout[0] }} --secret {{ rhsso_gitea_secret }} 2>&1)
+      if echo "$output" | grep -qF 'UPDATE'; then
+          echo changed
+      elif echo "$output" | grep -qF 'Failed to run app'; then
+          echo failed
+      else
+          echo ok
+      fi
+    {% else %}
+      echo "Gitea RHSSO client doesn't need updated"
       echo ok
-    elif echo "$output" | grep -qF 'Failed to run app'; then
-        echo "failed"
-        echo "output: $output"
-    elif echo "$output" | grep -qE 'INSERT INTO "login_source"'; then
-       echo "changed"
-    else
-        echo "failed"
-        echo "output: $output"
-    fi
+    {% endif %}
     echo "$output" >&2
   register: gitea_rhsso_oauth
   changed_when: '"changed" in gitea_rhsso_oauth.stdout_lines'
