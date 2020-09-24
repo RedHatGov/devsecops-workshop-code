@@ -70,3 +70,9 @@
   until: nexus_pod.resources|length > 0 and (nexus_pod.resources|first).status.phase == "Running"
   retries: 10
   delay: 30
+
+- name: Add NexusUsers to create local rut-auth accounts
+  k8s:
+    kubeconfig: '{{ kubeconfig }}'
+    namespace: '{{ nexus_project_name }}'
+    definition: '{{ lookup("template", "nexususer.yml.j2")|from_yaml }}'
