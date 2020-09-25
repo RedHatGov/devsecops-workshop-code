@@ -5,26 +5,24 @@ metadata:
   namespace: quay-enterprise
 spec:
   clair:
-    enabled: true
-    imagePullSecretName: dummy-pull-secret
+    enabled: false
   quay:
-{% if (enable_quay_repo_mirroring|default(false)) %}
+{% if enable_quay_repo_mirroring|bool %}
     enableRepoMirroring: true
 {% endif %}
     externalAccess:
       hostname: {{ quay_route }}
-{% if (use_real_certs|default(true)) %}
       tls:
-        secretName: quay-tls-certs
-        termination: passthrough
-{% endif %}
+        termination: edge
     imagePullSecretName: dummy-pull-secret
-    superuserCredentialsSecretName: quay-superuser
     database:
+      image: registry.redhat.io/rhscl/postgresql-96-rhel7
       volumeSize: 10Gi
     registryStorage:
       persistentVolumeSize: 10Gi
-{% if not (deploy_ocs|default(true)) %}
       persistentVolumeAccessModes:
         - ReadWriteOnce
-{% endif %}
+    securityContext:
+      fsGroup: 1001
+  redis:
+    image: 'registry.redhat.io/rhscl/redis-32-rhel7:latest'

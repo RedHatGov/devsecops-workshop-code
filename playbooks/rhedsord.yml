@@ -4,7 +4,7 @@
     - name: rhedsord_registry_username
       prompt: "What is the username for the disconnected registry?"
       private: no
-    
+
     - name: rhedsord_registry_password
       prompt: "What is the password for the disconnected registry"
 
