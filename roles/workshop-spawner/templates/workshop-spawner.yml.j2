@@ -4,19 +4,19 @@ items:
   kind: ServiceAccount
   metadata:
     labels:
-      app: external-keycloak
+      app: devsecops-workshop-dashboard
       class: spawner
-      spawner: external-keycloak
-    name: external-keycloak-spawner
+      spawner: devsecops-workshop-dashboard
+    name: devsecops-workshop-dashboard-spawner
     namespace: {{ workshop_spawner_project_name }}
 - apiVersion: authorization.openshift.io/v1
   kind: ClusterRoleBinding
   metadata:
     labels:
-      app: external-keycloak
+      app: devsecops-workshop-dashboard
       class: spawner
-      spawner: external-keycloak
-    name: external-keycloak-spawner-basic
+      spawner: devsecops-workshop-dashboard
+    name: devsecops-workshop-dashboard-spawner-basic
     namespace: {{ workshop_spawner_project_name }}
   roleRef:
     apiGroup: rbac.authorization.k8s.io
@@ -24,16 +24,16 @@ items:
     name: admin
   subjects:
   - kind: ServiceAccount
-    name: external-keycloak-spawner
+    name: devsecops-workshop-dashboard-spawner
     namespace: {{ workshop_spawner_project_name }}
 - apiVersion: authorization.openshift.io/v1
   kind: ClusterRole
   metadata:
     labels:
-      app: external-keycloak
+      app: devsecops-workshop-dashboard
       class: spawner
-      spawner: external-keycloak
-    name: external-keycloak-spawner-extra
+      spawner: devsecops-workshop-dashboard
+    name: devsecops-workshop-dashboard-spawner-extra
   rules:
   - apiGroups:
     - ""
@@ -96,70 +96,70 @@ items:
   kind: ClusterRoleBinding
   metadata:
     labels:
-      app: external-keycloak
+      app: devsecops-workshop-dashboard
       class: spawner
-      spawner: external-keycloak
-    name: external-keycloak-spawner-extra
+      spawner: devsecops-workshop-dashboard
+    name: devsecops-workshop-dashboard-spawner-extra
   roleRef:
-    name: external-keycloak-spawner-extra
+    name: devsecops-workshop-dashboard-spawner-extra
   subjects:
   - kind: ServiceAccount
-    name: external-keycloak-spawner
+    name: devsecops-workshop-dashboard-spawner
     namespace: {{ workshop_spawner_project_name }}
 - apiVersion: authorization.openshift.io/v1
   kind: ClusterRole
   metadata:
     labels:
-      app: external-keycloak
+      app: devsecops-workshop-dashboard
       class: spawner
-      spawner: external-keycloak
-    name: external-keycloak-spawner-rules
+      spawner: devsecops-workshop-dashboard
+    name: devsecops-workshop-dashboard-spawner-rules
   rules: []
 - apiVersion: authorization.openshift.io/v1
   kind: ClusterRoleBinding
   metadata:
     labels:
-      app: external-keycloak
+      app: devsecops-workshop-dashboard
       class: spawner
-      spawner: external-keycloak
-    name: external-keycloak-spawner-rules
+      spawner: devsecops-workshop-dashboard
+    name: devsecops-workshop-dashboard-spawner-rules
   roleRef:
-    name: external-keycloak-spawner-rules
+    name: devsecops-workshop-dashboard-spawner-rules
   subjects:
   - kind: ServiceAccount
-    name: external-keycloak-spawner
+    name: devsecops-workshop-dashboard-spawner
     namespace: {{ workshop_spawner_project_name }}
 - apiVersion: authorization.openshift.io/v1
   kind: ClusterRole
   metadata:
     labels:
-      app: external-keycloak
+      app: devsecops-workshop-dashboard
       class: spawner
-      spawner: external-keycloak
-    name: external-keycloak-session-rules
+      spawner: devsecops-workshop-dashboard
+    name: devsecops-workshop-dashboard-session-rules
   rules: []
 - apiVersion: authorization.openshift.io/v1
   kind: ClusterRoleBinding
   metadata:
     labels:
-      app: external-keycloak
+      app: devsecops-workshop-dashboard
       class: spawner
-      spawner: external-keycloak
-    name: external-keycloak-session-rules
+      spawner: devsecops-workshop-dashboard
+    name: devsecops-workshop-dashboard-session-rules
   roleRef:
-    name: external-keycloak-session-rules
+    name: devsecops-workshop-dashboard-session-rules
   subjects:
   - kind: ServiceAccount
-    name: external-keycloak-spawner
+    name: devsecops-workshop-dashboard-spawner
     namespace: {{ workshop_spawner_project_name }}
 - apiVersion: image.openshift.io/v1
   kind: ImageStream
   metadata:
     labels:
-      app: external-keycloak
+      app: devsecops-workshop-dashboard
       class: spawner
-      spawner: external-keycloak
-    name: external-keycloak-spawner
+      spawner: devsecops-workshop-dashboard
+    name: devsecops-workshop-dashboard-spawner
     namespace: {{ workshop_spawner_project_name }}
   spec:
     tags:
@@ -174,10 +174,10 @@ items:
   kind: ConfigMap
   metadata:
     labels:
-      app: external-keycloak
+      app: devsecops-workshop-dashboard
       class: spawner
-      spawner: external-keycloak
-    name: external-keycloak-spawner-configs
+      spawner: devsecops-workshop-dashboard
+    name: devsecops-workshop-dashboard-spawner-configs
     namespace: {{ workshop_spawner_project_name }}
 - apiVersion: v1
   data:
@@ -185,10 +185,10 @@ items:
   kind: ConfigMap
   metadata:
     labels:
-      app: external-keycloak
+      app: devsecops-workshop-dashboard
       class: spawner
-      spawner: external-keycloak
-    name: external-keycloak-session-resources
+      spawner: devsecops-workshop-dashboard
+    name: devsecops-workshop-dashboard-session-resources
     namespace: {{ workshop_spawner_project_name }}
 - apiVersion: v1
   data:
@@ -198,42 +198,42 @@ items:
   kind: ConfigMap
   metadata:
     labels:
-      app: external-keycloak
+      app: devsecops-workshop-dashboard
       class: spawner
-      spawner: external-keycloak
-    name: external-keycloak-session-envvars
+      spawner: devsecops-workshop-dashboard
+    name: devsecops-workshop-dashboard-session-envvars
     namespace: {{ workshop_spawner_project_name }}
 - apiVersion: apps.openshift.io/v1
   kind: DeploymentConfig
   metadata:
     labels:
-      app: external-keycloak
+      app: devsecops-workshop-dashboard
       class: spawner
-      spawner: external-keycloak
-    name: external-keycloak-spawner
+      spawner: devsecops-workshop-dashboard
+    name: devsecops-workshop-dashboard-spawner
     namespace: {{ workshop_spawner_project_name }}
   spec:
     replicas: 1
     selector:
-      deploymentconfig: external-keycloak-spawner
+      deploymentconfig: devsecops-workshop-dashboard-spawner
     strategy:
       type: Recreate
     template:
       metadata:
         labels:
-          app: external-keycloak
+          app: devsecops-workshop-dashboard
           class: spawner
-          deploymentconfig: external-keycloak-spawner
-          spawner: external-keycloak
+          deploymentconfig: devsecops-workshop-dashboard-spawner
+          spawner: devsecops-workshop-dashboard
       spec:
         containers:
         - env:
           - name: CONFIGURATION_TYPE
             value: external-keycloak
           - name: APPLICATION_NAME
-            value: external-keycloak
+            value: devsecops-workshop-dashboard
           - name: WORKSHOP_NAME
-            value: external-keycloak
+            value: devsecops-workshop-dashboard
           - name: HOMEROOM_NAME
             value: ""
           - name: WORKSHOP_IMAGE
@@ -314,18 +314,18 @@ items:
             name: configs
           - mountPath: /opt/app-root/resources
             name: resources
-        serviceAccountName: external-keycloak-spawner
+        serviceAccountName: devsecops-workshop-dashboard-spawner
         volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: external-keycloak-spawner-data
+            claimName: devsecops-workshop-dashboard-spawner-data
         - configMap:
             defaultMode: 420
-            name: external-keycloak-spawner-configs
+            name: devsecops-workshop-dashboard-spawner-configs
           name: configs
         - configMap:
             defaultMode: 420
-            name: external-keycloak-session-resources
+            name: devsecops-workshop-dashboard-session-resources
           name: resources
     triggers:
     - type: ConfigChange
@@ -335,16 +335,16 @@ items:
         - spawner
         from:
           kind: ImageStreamTag
-          name: external-keycloak-spawner:latest
+          name: devsecops-workshop-dashboard-spawner:latest
       type: ImageChange
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
     labels:
-      app: external-keycloak
+      app: devsecops-workshop-dashboard
       class: spawner
-      spawner: external-keycloak
-    name: external-keycloak-spawner-data
+      spawner: devsecops-workshop-dashboard
+    name: devsecops-workshop-dashboard-spawner-data
     namespace: {{ workshop_spawner_project_name }}
   spec:
     accessModes:
@@ -356,10 +356,10 @@ items:
   kind: Service
   metadata:
     labels:
-      app: external-keycloak
+      app: devsecops-workshop-dashboard
       class: spawner
-      spawner: external-keycloak
-    name: external-keycloak-spawner
+      spawner: devsecops-workshop-dashboard
+    name: devsecops-workshop-dashboard-spawner
     namespace: {{ workshop_spawner_project_name }}
   spec:
     ports:
@@ -372,7 +372,7 @@ items:
       protocol: TCP
       targetPort: 8081
     selector:
-      deploymentconfig: external-keycloak-spawner
+      deploymentconfig: devsecops-workshop-dashboard-spawner
 - apiVersion: route.openshift.io/v1
   kind: Route
   metadata:
@@ -382,10 +382,10 @@ items:
       homeroom/title: ""
       kubernetes.io/tls-acme: "false"
     labels:
-      app: external-keycloak
+      app: devsecops-workshop-dashboard
       class: spawner
-      spawner: external-keycloak
-    name: external-keycloak-spawner
+      spawner: devsecops-workshop-dashboard
+    name: devsecops-workshop-dashboard-spawner
     namespace: {{ workshop_spawner_project_name }}
   spec:
     host: dashboard.{{ cluster_router }}
@@ -396,16 +396,16 @@ items:
       termination: edge
     to:
       kind: Service
-      name: external-keycloak-spawner
+      name: devsecops-workshop-dashboard-spawner
       weight: 100
 - apiVersion: image.openshift.io/v1
   kind: ImageStream
   metadata:
     labels:
-      app: external-keycloak
+      app: devsecops-workshop-dashboard
       class: spawner
-      spawner: external-keycloak
-    name: external-keycloak-session
+      spawner: devsecops-workshop-dashboard
+    name: devsecops-workshop-dashboard-session
     namespace: {{ workshop_spawner_project_name }}
   spec:
     lookupPolicy:
