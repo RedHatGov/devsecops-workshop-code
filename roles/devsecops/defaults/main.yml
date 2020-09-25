@@ -6,5 +6,7 @@ deploy_nexus: true
 deploy_crw: true
 deploy_pipeline: true
 deploy_workshop: true
+deploy_rocketchat: true
+deploy_username_distribution: true
 
 pipeline_style: tekton

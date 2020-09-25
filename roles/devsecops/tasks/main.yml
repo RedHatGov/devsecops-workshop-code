@@ -20,6 +20,12 @@
     name: codeready-workspaces
   when: deploy_crw
 - include_role:
+    name: username-distribution
+  when: deploy_username_distribution
+- include_role:
+    name: rocket-chat
+  when: deploy_rocketchat
+- include_role:
     name: workshop-spawner
   when: deploy_workshop
 

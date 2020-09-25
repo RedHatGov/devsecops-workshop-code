@@ -1,0 +1,102 @@
+
+- name: Register admin user
+  uri:
+    url: '{{ rocketchat_url }}/api/v1/users.register'
+    validate_certs: false
+    method: POST
+    headers:
+      Content-Type: application/json
+    body:
+      username: admin
+      email: admin@example.com
+      pass: '{{ rocketchat_password }}'
+      name: Workshop Administrator
+    body_format: json
+    return_content: true
+    status_code: 200,400
+  register: registration
+  changed_when: registration.status == 200
+
+- name: Get auth token
+  uri:
+    url: '{{ rocketchat_url }}/api/v1/login'
+    validate_certs: false
+    method: POST
+    headers:
+      Content-Type: application/json
+    body:
+      user: admin
+      password: '{{ rocketchat_password }}'
+    body_format: json
+    return_content: true
+  register: auth_response
+
+- set_fact:
+    auth_token: "{{ auth_response.content | from_json | json_query('data.authToken') }}"
+    user_id: "{{ auth_response.content | from_json | json_query('data.me._id') }}"
+
+- name: Update Site URL
+  uri:
+    url: '{{ rocketchat_url }}/api/v1/settings/Site_Url'
+    validate_certs: false
+    method: POST
+    headers:
+      X-Auth-Token: '{{ auth_token }}'
+      X-User-Id: '{{ user_id }}'
+    body:
+      value: '{{ rocketchat_url }}'
+    return_content: true
+    body_format: json
+  register: site_url
+
+- name: Complete Setup Wizard
+  uri:
+    url: '{{ rocketchat_url }}/api/v1/settings/Show_Setup_Wizard'
+    validate_certs: false
+    method: POST
+    headers:
+      X-Auth-Token: '{{ auth_token }}'
+      X-User-Id: '{{ user_id }}'
+    body:
+      value: completed
+    return_content: true
+    body_format: json
+  register: site_url
+
+- name: Turn off notification volume
+  uri:
+    url: '{{ rocketchat_url }}/api/v1/settings/Accounts_Default_User_Preferences_notificationsSoundVolume'
+    validate_certs: false
+    method: POST
+    headers:
+      X-Auth-Token: '{{ auth_token }}'
+      X-User-Id: '{{ user_id }}'
+    body:
+      value: '0'
+    return_content: true
+    body_format: json
+  register: site_url
+
+- name: Register workshop users
+  uri:
+    url: '{{ rocketchat_url }}/api/v1/users.register'
+    validate_certs: false
+    method: POST
+    headers:
+      Content-Type: application/json
+    body:
+      username: '{{ user.username }}'
+      email: '{{ user.username }}@example.com'
+      pass: '{{ user.password }}'
+      name: '{{ user.username }}'
+    body_format: json
+    return_content: true
+    status_code: 200,400
+  register: registration
+  changed_when: registration.status == 200
+  when: create_workshop_users
+  loop: '{{ workshop_users }}'
+  loop_control:
+    loop_var: user
+    label: '{{ user.username }}'
+  

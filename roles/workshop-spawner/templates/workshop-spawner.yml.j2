@@ -278,6 +278,10 @@ items:
             value: codeready-public
           - name: CUSTOM_TAB_1
             value: "CodeReady Workspaces=https://codeready-{{ crw_project_name }}.{{ cluster_router }}"
+{% if deploy_rocketchat %}
+          - name: CUSTOM_TAB_2
+            value: "Chat=https://rocketchat-{{ rocketchat_project_name }}.{{ cluster_router }}"
+{% endif %}
           - name: API_SERVER
             value: https://api.{{ cluster_name }}.{{ openshift_base_domain }}:6443
           livenessProbe:
