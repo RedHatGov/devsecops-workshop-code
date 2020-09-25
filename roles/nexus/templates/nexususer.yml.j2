@@ -1,4 +1,4 @@
-{% for user in rhsso_users|json_query("[?(@.jenkinsRole)]") %}
+{% for user in rhsso_users|json_query("[?(@.nexusRole)]") %}
 - apiVersion: redhatgov.io/v1alpha1
   kind: NexusUser
   metadata:
