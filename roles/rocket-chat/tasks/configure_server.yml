@@ -35,20 +35,6 @@
     auth_token: "{{ auth_response.content | from_json | json_query('data.authToken') }}"
     user_id: "{{ auth_response.content | from_json | json_query('data.me._id') }}"
 
-- name: Update Site URL
-  uri:
-    url: '{{ rocketchat_url }}/api/v1/settings/Site_Url'
-    validate_certs: false
-    method: POST
-    headers:
-      X-Auth-Token: '{{ auth_token }}'
-      X-User-Id: '{{ user_id }}'
-    body:
-      value: '{{ rocketchat_url }}'
-    return_content: true
-    body_format: json
-  register: site_url
-
 - name: Complete Setup Wizard
   uri:
     url: '{{ rocketchat_url }}/api/v1/settings/Show_Setup_Wizard'

@@ -31,6 +31,8 @@
           - containerPort: 3000
             protocol: TCP
           env:
+          - name: ROOT_URL
+            value: "{{ rocketchat_url }}"
           - name: MONGO_URL
             value: "mongodb://{{ mongodb_user }}:{{ mongodb_password }}@rocketchat-mongodb:27017/rocketchat"
           - name: MONGO_OPLOG_URL
