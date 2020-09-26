@@ -9,7 +9,7 @@ spec:
     name: "{{ database.name }}"
     password: "{{ database.password }}"
     port: "{{ database.port }}"
-{% if mattermost.configStorage.persistentVolumeSize is defined or mattermost.logStorage.persistentVolumeSize is defined or mattermost.dataStorage.persistentVolumeSize is defined mattermost.pluginStorage.persistentVolumeSize is defined %}
+{% if mattermost.configStorage.persistentVolumeSize is defined or mattermost.logStorage.persistentVolumeSize is defined or mattermost.dataStorage.persistentVolumeSize is defined or mattermost.pluginStorage.persistentVolumeSize is defined %}
   mattermost:
 {% if mattermost.configStorage.persistentVolumeSize is defined %}
     configStorage:

@@ -8,3 +8,5 @@ database:
   name: mattermost
   password: mattermost
   port: 5432
+
+subdomain: '{{ full_cluster_name }}'

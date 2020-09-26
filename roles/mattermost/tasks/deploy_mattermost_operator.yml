@@ -1,6 +1,15 @@
+- name: Ensure Mattermost Operator Namespace Exists
+  community.kubernetes.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    api_version: v1
+    kind: Namespace
+    name: "{{ mattermost_namespace }}"
+
 - name: Subscribe to Mattermost Operator
   community.kubernetes.k8s:
     state: present
+    kubeconfig: "{{ kubeconfig }}"
     definition: |-
       apiVersion: operators.coreos.com/v1alpha1
       kind: Subscription
@@ -11,10 +20,11 @@
         channel: "{{ mattermost_operator_channel }}"
         installPlanApproval: Automatic
         name: mattermost-operator
-        source: mattermost-operator
+        source: redhatgov-operators
         sourceNamespace: openshift-marketplace
 
 - name: Create Mattermost 
   community.kubernetes.k8s:
     state: present
-    resource_definition: "{{ lookup('template', 'mattermost-resource.yml') }}"
+    kubeconfig: "{{ kubeconfig }}"
+    resource_definition: "{{ lookup('template', 'mattermost-resource.yml.j2') }}"
