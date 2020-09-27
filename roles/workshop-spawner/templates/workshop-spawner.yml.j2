@@ -278,7 +278,7 @@ items:
             value: codeready-public
           - name: CUSTOM_TAB_1
             value: "CodeReady Workspaces=https://codeready-{{ crw_project_name }}.{{ cluster_router }}"
-{% if deploy_rocketchat %}
+{% if deploy_rocketchat | bool %}
           - name: CUSTOM_TAB_2
             value: "Chat=https://rocketchat-{{ rocketchat_project_name }}.{{ cluster_router }}"
 {% endif %}

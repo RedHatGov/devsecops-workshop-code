@@ -52,10 +52,25 @@
               secretKeyRef:
                 name: rocketchat-secret
                 key: email
+          - name: MONGODB_USER
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-secret
+                key: username
+          - name: MONGODB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-secret
+                key: password
+          - name: MONGODB_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-secret
+                key: admin_password
           - name: MONGO_URL
-            value: "mongodb://{{ mongodb_user }}:{{ mongodb_password }}@rocketchat-mongodb:27017/rocketchat"
+            value: "mongodb://$(MONGODB_USER):$(MONGODB_PASSWORD)@rocketchat-mongodb:27017/rocketchat"
           - name: MONGO_OPLOG_URL
-            value: "mongodb://admin:{{ mongodb_admin_password }}@rocketchat-mongodb:27017/local?authSource=admin&replSet=rs0"
+            value: "mongodb://admin:$(MONGODB_ADMIN_PASSWORD)@rocketchat-mongodb:27017/local?authSource=admin&replSet=rs0"
           resources: {}
           volumeMounts:
           - name: rocketchat-volume-1
