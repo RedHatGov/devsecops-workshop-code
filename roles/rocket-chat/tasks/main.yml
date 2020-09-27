@@ -58,6 +58,12 @@
   retries: 10
   delay: 30
 
+- name: Create rocket-chat Secret
+  k8s:
+    kubeconfig: '{{ kubeconfig }}'
+    namespace: '{{ rocketchat_project_name }}'
+    definition: "{{ lookup('template', 'rocketchat-secret.yml.j2') }}"
+
 - name: Create Rocket.Chat Deployment
   k8s:
     kubeconfig: '{{ kubeconfig }}'
@@ -74,5 +80,25 @@
   retries: 10
   delay: 30
 
-- name: Configure Server
-  include_tasks: configure_server.yml
+- name: Register workshop user {{ user.username }}
+  uri:
+    url: '{{ rocketchat_url }}/api/v1/users.register'
+    validate_certs: false
+    method: POST
+    headers:
+      Content-Type: application/json
+    body:
+      username: '{{ user.username }}'
+      email: '{{ user.username }}@example.com'
+      pass: '{{ user.password }}'
+      name: '{{ user.username }}'
+    body_format: json
+    return_content: true
+    status_code: 200,400
+  register: registration
+  changed_when: registration.status == 200
+  loop: '{{ workshop_users }}'
+  loop_control:
+    loop_var: user
+    label: '{{ user.username }}'
+  when: create_workshop_users
