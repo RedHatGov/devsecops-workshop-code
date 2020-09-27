@@ -77,7 +77,7 @@
             mountPath: /app/uploads
           readinessProbe:
             httpGet:
-              path: /api/v1/info
+              path: /api/v1/settings.public
               port: 3000
               scheme: HTTP
             initialDelaySeconds: 5
@@ -87,7 +87,7 @@
             failureThreshold: 3
           livenessProbe:
             httpGet:
-              path: /api/v1/info
+              path: /api/v1/settings.public
               port: 3000
               scheme: HTTP
             initialDelaySeconds: 30
