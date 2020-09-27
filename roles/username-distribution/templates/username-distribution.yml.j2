@@ -53,7 +53,10 @@ items:
           - name: LAB_USER_PAD_ZERO
             value: 'false'
           - name: LAB_ADMIN_PASS
-            value: pleasechangethis
+            valueFrom:
+              secretKeyRef:
+                name: username-distribution-secret
+                key: password
           image: quay.io/akrohg/username-distribution:latest
           imagePullPolicy: IfNotPresent
           name: username-distribution
@@ -144,3 +147,11 @@ items:
       name: latest
       referencePolicy:
         type: Source
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: username-distribution-secret
+  type: Opaque
+  data:
+    username: "{{ 'admin' | b64encode }}"
+    password: "{{ username_distribution_admin_password | b64encode }}"
