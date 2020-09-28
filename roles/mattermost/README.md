@@ -1,32 +1,10 @@
-Role Name
-=========
+Mattermost 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 A role to install mattermost on OpenShift. Currently this role only supports deployment via a Red Hat written mattermost operator. 
-=======
-A brief description of the role goes here.
-<<<<<<< HEAD
->>>>>>> initial mattermost work
-=======
->>>>>>> 62f6310... initial mattermost work
-<<<<<<< HEAD
->>>>>>> initial mattermost work
-=======
-=======
-A role to install mattermost on OpenShift. Currently this role only supports deployment via a Red Hat written mattermost operator. 
->>>>>>> 47c28eb... finish README
->>>>>>> finish README
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 47c28eb... finish README
 This role currently supports the deployment of Mattermost via operator. For more information on the operator please visit [this link](https://github.com/RedHatGov/mattermost-operator). If you are planning to run this role to deploy Mattermost via the operator deployment in a disconnected environment, the following images must be available (this operator deployment assumes the operator is subscibable via operatorhub):
 
 * quay.io/redhatgov/mattermost-operator:v1.0.0
@@ -56,7 +34,8 @@ spec:
       interval: 30m
 ```
 
-<<<<<<< HEAD
+This role also requires the openshift and kubenetes python packages.
+
 Role Variables
 --------------
 
@@ -97,71 +76,10 @@ The role variables here provided by default (default/main.yml), and that can be 
 | Variable | Example Value | Description |
 |----------|---------------|-------------|
 |`authentication.keycloak.realmUrl`|`https://keycloak.apps.example.com/auth/realms/my-realm`|keycloak realm url for SSO|
-
-
-=======
-=======
->>>>>>> 47c28eb... finish README
-Role Variables
---------------
-
-The role variables here provided by default (default/main.yml), and that can be specified specifically, are largely derived from the parameters used for the [Mattermost CR](https://github.com/RedHatGov/mattermost-operator/blob/main/config/samples/advanced_mattermost_v1alpha1_mattermost.yaml).
-
-**By default we provide:**
-
-### Mattermost
-| Variable | Value | Description |
-|----------|-------|-------------|
-|`mattermost_name` | `mattermost`|this will be the OpenShift deployment name of your mattermost instance             |
-|`mattermost_namespace`| `mattermost-operator`|this will be the namespace to deploy the mattermost operator / and instance |
-|`mattermost_operator_channel`|`stable`|operator channel to subscribe to (`stable` and `beta` exist)|
-
-### Database
-| Variable | Value | Description |
-|----------|-------|-------------|
-|`database.drivername`|`postgres`|this is type of database the operator will use or create (in the future capabilities for MYSQL will be added)|
-|`database.name`|`mattermost`|this is the name of the database to use or create in the database instance|
-|`database.password`|`mattermost`|this is the password for accessing the database|
-|`database.port`|`5432`|port to query on database|
-
-| Variable | Value | Description |
-|----------|-------|-------------|
-|`authentication.keycloak.secret`|`mattermost`|keycloak secret for authentication access|
-
-**Additional variables you might want to specify:**
-
-### Mattermost
-| Variable | Example Value | Description |
-|----------|---------------|-------------|
-|`mattermost.configStorage.persistentVolumeSize`|`1Gi`|Storage size to provide to mattermost directory `mattermost/config` |
-|`mattermost.logStorage.persistentVolumeSize`|`1Gi`|Storage size to provide to mattermost directory `mattermost/logs` |
-|`mattermost.dataStorage.persistentVolumeSize`|`1Gi`|Storage size to provide to mattermost directory `mattermost/data` |
-|`mattermost.pluginStorage.persistentVolumeSize`|`1Gi`|Storage size to provide to mattermost directory `mattermost/plugins` |
-
-### Authentication
-| Variable | Example Value | Description |
-|----------|---------------|-------------|
-|`authentication.keycloak.realmUrl`|`https://keycloak.apps.example.com/auth/realms/my-realm`|keycloak realm url for SSO|
-
-
-<<<<<<< HEAD
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
-<<<<<<< HEAD
->>>>>>> initial mattermost work
-=======
->>>>>>> 62f6310... initial mattermost work
-<<<<<<< HEAD
->>>>>>> initial mattermost work
-=======
-=======
->>>>>>> 47c28eb... finish README
->>>>>>> finish README
 
 Example Playbook
 ----------------
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 **Standard, hassle free deployment:**
 ```
     - hosts: servers
@@ -202,81 +120,8 @@ Example Playbook
 
 License
 -------
-=======
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-=======
-**Standard, hassle free deployment:**
-```
->>>>>>> 47c28eb... finish README
-    - hosts: servers
-
-      roles:
-      - role: mattermost
-```
-
-**The works:**
-```
-- hosts: servers
-
-  roles:
-  - role: mattermost
-    vars:
-      mattermost_name: my-org-mattermost
-      mattermost_namespace: my-org-mattermost-ns
-      mattermost_operator_channel: stable
-      database:
-        drivername: postgres
-        name: my-org-mattermost-database
-        password: custom-passwords-are-fun!
-        port: 5432
-      mattermost:
-        configStorage:
-          persistentVolumeSize: 1Gi
-        logStorage:
-          persistentVolumeSize: 3Gi
-        dataStorage:
-          persistentVolumeSize: 5Gi
-        pluginStorage:
-          persistentVolumeSize: 2Gi
-      authentication:
-          keycloak:
-            realmUrl: 'https://keycloak.apps.example.com/auth/realms/my-realm'
-            secret: 1f6d2d53-6c46-46e9-860c-4ed0c80b703b
-```
-
-License
--------
-<<<<<<< HEAD
-
-<<<<<<< HEAD
->>>>>>> initial mattermost work
-=======
->>>>>>> 62f6310... initial mattermost work
-<<<<<<< HEAD
->>>>>>> initial mattermost work
-=======
-=======
->>>>>>> 47c28eb... finish README
->>>>>>> finish README
 BSD
 
 Author Information
 ------------------
-<<<<<<< HEAD
-<<<<<<< HEAD
 [Griffin College](https://github.com/griffincollege)
-=======
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
-<<<<<<< HEAD
->>>>>>> initial mattermost work
-=======
->>>>>>> 62f6310... initial mattermost work
-<<<<<<< HEAD
->>>>>>> initial mattermost work
-=======
-=======
-[Griffin College](https://github.com/griffincollege)
->>>>>>> 47c28eb... finish README
->>>>>>> finish README

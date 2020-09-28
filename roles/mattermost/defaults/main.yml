@@ -8,13 +8,5 @@ database:
   name: mattermost
   password: mattermost
   port: 5432
-<<<<<<< HEAD
-<<<<<<< HEAD
 
 subdomain: '{{ full_cluster_name }}'
-=======
->>>>>>> initial mattermost work
-=======
-
-subdomain: '{{ full_cluster_name }}'
->>>>>>> a ton of changes to add keycloak integration to mattermost

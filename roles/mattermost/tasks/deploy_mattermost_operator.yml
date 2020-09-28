@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> a ton of changes to add keycloak integration to mattermost
 - name: Ensure Mattermost Operator Namespace Exists
   community.kubernetes.k8s:
     state: present
@@ -10,22 +6,10 @@
     kind: Namespace
     name: "{{ mattermost_namespace }}"
 
-<<<<<<< HEAD
 - name: Subscribe to Mattermost Operator
   community.kubernetes.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
-=======
-- name: Subscribe to Mattermost Operator
-  community.kubernetes.k8s:
-    state: present
->>>>>>> initial mattermost work
-=======
-- name: Subscribe to Mattermost Operator
-  community.kubernetes.k8s:
-    state: present
-    kubeconfig: "{{ kubeconfig }}"
->>>>>>> a ton of changes to add keycloak integration to mattermost
     definition: |-
       apiVersion: operators.coreos.com/v1alpha1
       kind: Subscription
@@ -36,28 +20,11 @@
         channel: "{{ mattermost_operator_channel }}"
         installPlanApproval: Automatic
         name: mattermost-operator
-<<<<<<< HEAD
-<<<<<<< HEAD
         source: redhatgov-operators
-=======
-        source: mattermost-operator
->>>>>>> initial mattermost work
-=======
-        source: redhatgov-operators
->>>>>>> a ton of changes to add keycloak integration to mattermost
         sourceNamespace: openshift-marketplace
 
 - name: Create Mattermost 
   community.kubernetes.k8s:
     state: present
-<<<<<<< HEAD
-<<<<<<< HEAD
     kubeconfig: "{{ kubeconfig }}"
     resource_definition: "{{ lookup('template', 'mattermost-resource.yml.j2') }}"
-=======
-    resource_definition: "{{ lookup('template', 'mattermost-resource.yml') }}"
->>>>>>> initial mattermost work
-=======
-    kubeconfig: "{{ kubeconfig }}"
-    resource_definition: "{{ lookup('template', 'mattermost-resource.yml.j2') }}"
->>>>>>> a ton of changes to add keycloak integration to mattermost
