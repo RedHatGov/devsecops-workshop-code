@@ -33,7 +33,7 @@
         channel: "{{ mattermost_operator_channel }}"
         installPlanApproval: Automatic
         name: mattermost-operator
-        source: "{{ operator_catalog_source }}"
+        source: redhatgov-operators
         sourceNamespace: openshift-marketplace
 
 - name: Create Mattermost 
