@@ -21,5 +21,8 @@
     name: quay
   when: deploy_quay
 - include_role:
+    name: mattermost
+  when: deploy_mattermost_operator
+- include_role:
     name: codeready-workspaces
   when: deploy_crw

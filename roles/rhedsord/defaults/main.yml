@@ -7,3 +7,4 @@ deploy_sonarqube: true
 deploy_nexus: true
 deploy_crw: true
 deploy_legacy_jenkins: true
+deploy_mattermost_operator: true
