@@ -58,10 +58,6 @@ The role variables here provided by default (default/main.yml), and that can be 
 |`database.password`|`mattermost`|this is the password for accessing the database|
 |`database.port`|`5432`|port to query on database|
 
-| Variable | Value | Description |
-|----------|-------|-------------|
-|`authentication.keycloak.secret`|`mattermost`|keycloak secret for authentication access|
-
 **Additional variables you might want to specify:**
 
 ### Mattermost
@@ -76,6 +72,7 @@ The role variables here provided by default (default/main.yml), and that can be 
 | Variable | Example Value | Description |
 |----------|---------------|-------------|
 |`authentication.keycloak.realmUrl`|`https://keycloak.apps.example.com/auth/realms/my-realm`|keycloak realm url for SSO|
+|`authentication.keycloak.secret`|`mattermost`|keycloak secret for authentication access|
 
 Example Playbook
 ----------------
