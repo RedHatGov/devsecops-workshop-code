@@ -21,32 +21,7 @@
     name: quay
   when: deploy_quay
 - include_role:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     name: mattermost
   when: deploy_mattermost_operator
-=======
     name: codeready-workspaces
   when: deploy_crw
-<<<<<<< HEAD
->>>>>>> Modify CRW role to use existing SSO instance
-=======
->>>>>>> Add newline to EOF in rhedsord role'
-=======
-=======
->>>>>>> initial mattermost work
-    name: codeready-workspaces
-  when: deploy_crw
-=======
-    name: mattermost
-  when: deploy_mattermost_operator
->>>>>>> 1385e63... initial mattermost work
-<<<<<<< HEAD
->>>>>>> initial mattermost work
-=======
-=======
-    name: mattermost
-  when: deploy_mattermost_operator
->>>>>>> 62f6310... initial mattermost work
->>>>>>> initial mattermost work
