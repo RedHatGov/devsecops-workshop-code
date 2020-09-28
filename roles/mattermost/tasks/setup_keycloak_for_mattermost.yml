@@ -8,7 +8,7 @@
   register: mattermost_route
   retries: 10
   delay: 3
-  until: mattermost_route.resources is defined
+  until: mattermost_route.resources[0].spec.host is defined
 
 - name: Set mattermost_url Variable
   set_fact:
