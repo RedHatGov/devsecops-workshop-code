@@ -74,12 +74,13 @@ workshop_admin:
 
 # The number of users created, as a string
 number_of_users: "30"
+user_password: openshift
 
 # Generate a sequence of users
 sequence_users: |
   {%- for username in lookup("sequence", "1-" + number_of_users + ":user%0i", wantlist=True) %}
     - username: {{ username }}
-      password: openshift
+      password: {{ user_password }}
   {% endfor -%}
 
 # The users to create in OpenShift

@@ -78,6 +78,14 @@ There's a playbook and associated vars file named `provision.yml` that expects t
 
    Note that no kubeconfig is required here. The provisioning step automatically puts it where it needs to go.
 
+## Admin credentials for tooling
+Some of the infrastructure components require a local admin user, which the corresponding roles create and store in plaintext `.password` files within `devsecops-workshop-code/tmp/{{ full_cluster_name }}` on your local (e.g. `devsecops-workshop-code/tmp/cluster-3d87.3d87.example.opentlc.com`). You can refer to this location if you need to perform administrative functions to the tooling after the workshop is provisioned. Use `admin` as a username, and the password in the corresponding file.
+
+Relevant components include:
+* username-distribution
+* sonarqube
+* rocketchat
+
 ### Development workflows
 
 `run-container.sh` has been developed to use the Dockerfile present to run the playbooks and roles inside a RHEL 8 UBI container image. This means you can use run-container.sh to package a new container image on the fly with your changes to the repository, satisfying dependencies, and then map tmp and vars in to the container. In order to enable multiple clusters being run with multiple containers, `run-container.sh` requires a cluster name, and your variables should be structured into folders.
