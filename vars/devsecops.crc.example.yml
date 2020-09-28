@@ -52,6 +52,9 @@ deploy_automated_build: no  # You shouldn't (resource constraints as things come
 # deploy_crw: no              # NEEDS byo_cert_fullchain_path DEFINED IN common.yml TO WORK
 # deploy_workshop: no         # NEEDS byo_cert_fullchain_path DEFINED IN common.yml TO WORK
 
+# deploy_username_distribution: no # Deploy this to use the Username Distribution app
+# deploy_rocketchat: no            # Deploy this to integrate a chat server into the dashboard
+
 # Change quay config definition to allow mirroring of image repositories
 # enable_quay_repo_mirroring: yes
 
