@@ -26,3 +26,6 @@
 - include_role:
     name: codeready-workspaces
   when: deploy_crw
+- include_role:
+    name: selenium-grid
+  when: deploy_selenium_grid
