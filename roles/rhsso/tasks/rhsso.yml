@@ -9,3 +9,15 @@
     kubeconfig: '{{ kubeconfig }}'
     definition: '{{ lookup("template", "rhsso-deployment.yml.j2")|from_yaml }}'
 
+- name: Wait for RH-SSO to finish being created
+  k8s_info:
+    kubeconfig: '{{ kubeconfig }}'
+    api_version: v1
+    kind: Pod
+    namespace: '{{ rhsso_project_name }}'
+    label_selectors:
+      - "app = keycloak"
+  register: rhsso_pod
+  until: rhsso_pod.resources|length > 0 and (rhsso_pod.resources|first).status.phase == "Running"
+  retries: 20
+  delay: 30
