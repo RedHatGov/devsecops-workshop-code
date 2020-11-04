@@ -8,23 +8,21 @@ spec:
     enabled: true
     imagePullSecretName: dummy-pull-secret
   quay:
-{% if (enable_quay_repo_mirroring|default(false)) %}
+{% if enable_quay_repo_mirroring|bool %}
     enableRepoMirroring: true
 {% endif %}
+    keepConfigDeployment: true
     externalAccess:
       hostname: {{ quay_route }}
-{% if do_quay_certs|bool %}
       tls:
-        secretName: quay-tls-certs
-        termination: passthrough
-{% endif %}
-    imagePullSecretName: dummy-pull-secret
-    superuserCredentialsSecretName: quay-superuser
+        termination: edge
+      type: Route
     database:
       volumeSize: 10Gi
+    imagePullSecretName: dummy-pull-secret
     registryStorage:
-      persistentVolumeSize: 10Gi
-{% if not (deploy_ocs|default(true)) %}
       persistentVolumeAccessModes:
         - ReadWriteOnce
-{% endif %}
+      persistentVolumeSize: 10Gi
+    securityContext:
+      fsGroup: 1001

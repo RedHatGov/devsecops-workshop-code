@@ -69,9 +69,21 @@
     namespace: "{{ crw_project_name }}"
   register: che_identity_secret
 
+- name: Get Postgres Pod
+  k8s_info:
+    kubeconfig: '{{ kubeconfig }}'
+    api_version: v1
+    kind: Pod
+    label_selectors:
+      - app = codeready
+      - component = postgres
+    namespace: "{{ crw_project_name }}"
+  register: postgres_pod
+
 - set_fact:
     sso_admin_password: "{{ che_identity_secret | json_query('resources[0].data.password') | b64decode }}"
     sso_admin_user: "{{ che_identity_secret | json_query('resources[0].data.user') | b64decode }}"
+    postgres_pod_name: '{{ postgres_pod.resources[0].metadata.name }}'
 
 - name: Get CodeReady SSO admin token
   uri:

@@ -4,7 +4,7 @@ provision_included: yes
 
 # The OpenShift version to install
 # MUST BE 4.X!!!
-openshift_version: "4.4"
+openshift_version: "4.5"
 
 # The AWS region (i.e. `us-east-1`)
 # Current options:
@@ -17,3 +17,7 @@ aws_region: us-east-2
 # Pull secret, acquired from:
 # https://cloud.redhat.com/openshift/install/pull-secret
 cloud_redhat_com_pull_secret: '{"auths":{"cloud.openshift.com":{"auth":"b3B=","email":"foo@example.com"},"quay.io":{"auth":"b3B=","email":"foo@example.com"},"registry.connect.redhat.com":{"auth":"NTI=","email":"foo@example.com"},"registry.redhat.io":{"auth":"NTI=","email":"foo@example.com"}}}'
+
+# Uncomment the following to disable LetsEncrypt certificates, aligning with an
+#   RHPDS-cluster with the box unticked. This will cause problems with Che. :)
+# letsencrypt: no     # Creates a LetsEncrypt wildcard and api certificate and makes it the default

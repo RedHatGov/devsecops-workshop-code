@@ -5,9 +5,6 @@
     definition: '{{ lookup("template", "project.yml.j2")|from_yaml }}'
 
 - include_role:
-    name: ocs
-  when: deploy_ocs
-- include_role:
     name: quay
   when: deploy_quay
 - include_role:
@@ -20,17 +17,14 @@
     name: nexus
   when: deploy_nexus
 - include_role:
-    name: 3scale
-  when: deploy_3scale
-- include_role:
-    name: service_mesh
-  when: deploy_service_mesh
-- include_role:
-    name: bookinfo
-  when: deploy_bookinfo
-- include_role:
     name: codeready-workspaces
   when: deploy_crw
+- include_role:
+    name: username-distribution
+  when: deploy_username_distribution
+- include_role:
+    name: rocket-chat
+  when: deploy_rocketchat
 - include_role:
     name: workshop-spawner
   when: deploy_workshop

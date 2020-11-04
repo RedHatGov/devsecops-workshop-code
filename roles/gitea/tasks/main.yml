@@ -11,43 +11,32 @@
           openshift.io/display-name: '{{ gitea_project_display }}'
       spec: {}
 
-- name: Deploy resources for Gitea Operator
+- name: Wait for gitea-operator package manifest to be available
+  k8s_info:
+    kubeconfig: '{{ kubeconfig }}'
+    api_version: packages.operators.coreos.com/v1
+    kind: PackageManifest
+    namespace: openshift-marketplace
+    name: gitea-operator
+  register: gitea_package_manifest
+  until: gitea_package_manifest.resources|length > 0 and (gitea_package_manifest.resources|first).status.catalogSource == "redhatgov-operators"
+  retries: 5
+  delay: 10
+
+- name: Subscribe to Gitea
   k8s:
     kubeconfig: '{{ kubeconfig }}'
-    namespace: '{{ resource.namespace|default(omit) }}'
-    definition: '{{ lookup("url", resource.url, split_lines=False)|from_yaml|regex_replace("REPLACE_ME", gitea_project_name) }}'
-  loop:
-    - name: crd
-      url: https://raw.githubusercontent.com/{{ github_project }}/gitea-operator/master/deploy/crds/gpte_v1alpha1_gitea_crd.yaml
-    - name: cluster_role
-      url: https://raw.githubusercontent.com/{{ github_project }}/gitea-operator/master/deploy/cluster_role.yaml
-    - name: service_account
-      url: https://raw.githubusercontent.com/{{ github_project }}/gitea-operator/master/deploy/service_account.yaml
-      namespace: '{{ gitea_project_name }}'
-    - name: cluster_role_binding
-      url: https://raw.githubusercontent.com/{{ github_project }}/gitea-operator/master/deploy/cluster_role_binding.yaml
-      namespace: '{{ gitea_project_name }}'
-    - name: operator
-      url: https://raw.githubusercontent.com/{{ github_project }}/gitea-operator/master/deploy/operator.yaml
-      namespace: '{{ gitea_project_name }}'
-  loop_control:
-    loop_var: resource
-    label: '{{ resource.name }}'
+    definition: '{{ lookup("template", "gitea-subscription.yml.j2")|from_yaml }}'
 
 - name: Create Gitea from a CR
   k8s:
     kubeconfig: '{{ kubeconfig }}'
     namespace: '{{ gitea_project_name }}'
     definition:
-      apiVersion: gpte.opentlc.com/v1alpha1
+      apiVersion: redhatgov.io/v1alpha1
       kind: Gitea
       metadata:
         name: gitea-server
-      spec:
-        postgresqlVolumeSize: 4Gi
-        giteaVolumeSize: 4Gi
-        giteaSsl: True
-        giteaName: gitea
   register: gitea_deployment
   until: not gitea_deployment.failed
   retries: 5
