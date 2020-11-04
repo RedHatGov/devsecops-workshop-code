@@ -2,8 +2,6 @@
 
 ---
 
-## **Note**: This is a temporary README to support testing and demonstration of the status of the repository, it is not the final intended README
-
 # Deprecation Notice
 This repository has been deprecated. The new installation procedure for this workshop is documented [here](https://github.com/redhatgov/devsecops-workshop-dashboard#install). The source code for the operator-based install resides [here](https://github.com/redhatgov/tssc-operator).
 
