@@ -2,6 +2,9 @@
 
 ---
 
+# Deprecation Notice
+This repository has been deprecated. The new installation procedure for this workshop is documented [here](https://github.com/redhatgov/devsecops-workshop-dashboard#install). The source code for the operator-based install resides [here](https://github.com/redhatgov/tssc-operator).
+
 ## Design Goals
 
 Several design goals were set in place before this started, and they have evolved somewhat as the work has gone on.
